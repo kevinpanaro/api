@@ -1,3 +1,12 @@
+'''
+Author: Kevin Panaro
+Date: 1.28.15
+Purpose: Grabs Evil Genius beers
+
+TODO: Something is weird with their menu. All the beers scraped are more
+      than the amount of beers on tap. Maybe it's also what they are 
+      selling on the side, but I don't think I want to change it.
+'''
 import logging
 from helpers.url_pull import beautiful_url
 from helpers.unicode_helper import unicode_to_ascii
