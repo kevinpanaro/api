@@ -90,5 +90,6 @@ def monks():
 
     output = {"brewery": BREWERY, "locations": output}
     save_beer(output, SAVE_FILE)
+
 if __name__ == '__main__':
     monks()
