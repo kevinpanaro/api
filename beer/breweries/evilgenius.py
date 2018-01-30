@@ -46,7 +46,7 @@ def parse_url(url):
             if stat[-1] == ":":
                 '''it's a dict key now'''
                 stat = stat.strip(":")
-                beer_stats_last = stat
+                beer_stats_last = stat.lower()
             else:
                 value = stat
                 beer_stats_dict[beer_stats_last] = value
