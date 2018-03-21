@@ -1,8 +1,7 @@
 '''
-Author: Kevin Panaro
-Date: 1.30.15
+Author:  Kevin Panaro
+Date:    1.30.15
 Purpose: Grabs Dock Street Beers on tap
-
 '''
 import logging
 import re
