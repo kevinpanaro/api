@@ -8,3 +8,4 @@ because there are some things I'd like api's for when the provider doesn't suppl
 - [Evil Genius](http://evilgeniusbeer.com/), because I live here
 - [Monk's Cafe](http://www.monkscafe.com/on-tap/), breaking the rules, but Monks always has a changing craft beer selection on tap
 - [Dock Street](http://www.dockstreetbeer.com/whats-on-tap/)
+- [Equinox](https://equinoxbrewing.com/), Beer here is good, and I go there for beer.
