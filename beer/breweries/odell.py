@@ -59,21 +59,14 @@ def parse_url(url):
 
         beer_details = beer.find_all('div', {'class':'columns small-12 medium-12'})
 
-        beer_stats = {}
-        # i'll figure out a nicer way for this later
-        for num, stat in enumerate(beer_details):
-            if num == 0:
-                ibu = stat.get_text().strip().split(":")
-                beer_stats['ibu'] = ibu[-1].strip().title()
-            elif num == 1:
-                style = stat.get_text().strip()
-                beer_stats['style'] = style
-            elif num == 2:
-                abv = stat.get_text().strip().split(":")
-                beer_stats['abv'] = abv[-1].strip().title()
-            elif num == 3:
-                availability = stat.get_text().strip()
-                beer_stats['availability'] = availability
+        beer_details = ([detail.get_text().strip() for detail in beer_details])
+
+        ibu, style, abv, availability = beer_details
+
+        beer_stats = {'ibu': ibu.split(':')[-1],
+                      'style': style,
+                      'abv': abv.split(':')[-1],
+                      'availability': availability}
 
         beer_dict = {"beer": beer_name,
                      "description": beer_description,
@@ -92,10 +85,10 @@ def odell():
     for location in locations:
         logging.info("Location: {}".format(location))
         beers = parse_url(BASE_URL)
-        output.append({"location": location, "beers": beers})
+    #     output.append({"location": location, "beers": beers})
 
-    output = {"brewery": BREWERY, "locations": output}
-    save_beer(output, SAVE_FILE)
+    # output = {"brewery": BREWERY, "locations": output}
+    # save_beer(output, SAVE_FILE)
 
 if __name__ == '__main__':
     odell()
