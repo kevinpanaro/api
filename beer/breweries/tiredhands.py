@@ -15,6 +15,7 @@ locations = ['fermentaria', 'cafe']
 
 def parse_url(url):
     '''gets beer data from url'''
+    kill = ["***Other Beverages***", "***Sunday Brunch Beverages***"]
     return_beers = []
 
     year = date.today().strftime('%y')
@@ -37,13 +38,28 @@ def parse_url(url):
     beers = data.find_all('div', 'menu-item')
     
     for beer in beers:
+        abv_regex = re.compile('([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%')
+        style_regex = re.compile('[\D]+')
+
         beer_dict = {}
+        beer_name = None
+        beer_description = None
+        beer_notes = None
+        beer_stats = {}
         try:
             beer_name = unicode_to_ascii(beer.find('div', 'menu-item-title').get_text().strip().strip(':'))
+            if beer_name in kill:
+                break
             logging.info("Beer found: {}".format(beer_name))
 
             beer_description = unicode_to_ascii(beer.find('div', 'menu-item-description').get_text().strip())
             logging.info("Description found")
+            abv = abv_regex.search(beer_description).group(0)
+            style = style_regex.search(beer_description).group(0)
+            if abv:
+                beer_stats['abv'] = abv
+            if style:
+                beer_stats['style'] = style.strip()
             try:
                 beer_notes = unicode_to_ascii(beer.find('div', 'menu-item-price-bottom').get_text().strip()[1::])
                 logging.info("Notes found")
@@ -51,17 +67,21 @@ def parse_url(url):
                 beer_notes = ""
                 logging.info("Notes not found")
         except AttributeError:
-            logging.info("Reached ends of beer")
-            break
-        beer_dict = {"beer": beer_name, "description": beer_description, "summary": beer_description + "\n" + beer_notes, "notes": beer_notes}
-        return_beers.append(beer_dict)
+            logging.info("bad beer")
+        if beer_name and beer_description and beer_notes and beer_stats:
+            beer_dict = {"beer": beer_name, 
+                         "description": beer_description, 
+                         "summary": beer_description + " " + beer_notes, 
+                         "notes": beer_notes, 
+                         "stats": beer_stats}
+            return_beers.append(beer_dict)
     return(return_beers, update_time)
     
 
 
 def tired_hands():
 
-    logLevel=logging.WARN
+    logLevel=logging.DEBUG
     FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
     logging.basicConfig(format=FORMAT,level=logLevel)
 
