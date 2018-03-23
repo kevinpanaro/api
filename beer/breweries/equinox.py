@@ -10,7 +10,7 @@ from helpers.unicode_helper import unicode_to_ascii
 from helpers.save_beer import save_beer
 
 BASE_URL = "https://equinoxbrewing.com/"
-BREWERY = "Equinox Brewing" # not a brewery just a BASE_URL
+BREWERY = "Equinox Brewing" 
 SAVE_FILE = "equinox.json"
 
 locations = ["133 Remington Street, Fort Collins, CO 80524"]
