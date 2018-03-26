@@ -7,6 +7,7 @@ from breweries.dockstreet import dock_street
 from breweries.monks import monks
 from breweries.equinox import equinox
 from breweries.odell import odell
+from breweries.mayorofoldtown import mayorofoldtown
 
 
 def pour_beer():
@@ -16,6 +17,7 @@ def pour_beer():
     dock_street()
     equinox()
     odell()
+    mayorofoldtown()
     # monks() # a later thing
 
 if __name__ == '__main__':

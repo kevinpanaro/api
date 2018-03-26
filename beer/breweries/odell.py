@@ -50,7 +50,7 @@ def parse_url(url):
 
         logging.debug("Beer Found: {}".format(beer_name))
 
-        beer_description = unicode_to_ascii(beer.find('div', {'class':'beer-content'}).get_text().strip())
+        beer_description = unicode_to_ascii(beer.find('div', {'class':'beer-content'}).get_text())
 
         if beer_description:
             logging.debug("Description: Found")
@@ -85,10 +85,10 @@ def odell():
     for location in locations:
         logging.info("Location: {}".format(location))
         beers = parse_url(BASE_URL)
-    #     output.append({"location": location, "beers": beers})
+        output.append({"location": location, "beers": beers})
 
-    # output = {"brewery": BREWERY, "locations": output}
-    # save_beer(output, SAVE_FILE)
+    output = {"brewery": BREWERY, "locations": output}
+    save_beer(output, SAVE_FILE)
 
 if __name__ == '__main__':
     odell()

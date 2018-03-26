@@ -46,35 +46,44 @@ def parse_url(url):
         beer_description = None
         beer_notes = None
         beer_stats = {}
+
         try:
-            beer_name = unicode_to_ascii(beer.find('div', 'menu-item-title').get_text().strip().strip(':'))
+            beer_name = unicode_to_ascii(beer.find('div', 'menu-item-title').get_text().strip(':'))
             if beer_name in kill:
+                logging.info("All beer found")
                 break
             logging.info("Beer found: {}".format(beer_name))
 
             beer_description = unicode_to_ascii(beer.find('div', 'menu-item-description').get_text().strip())
             logging.info("Description found")
+
             abv = abv_regex.search(beer_description).group(0)
             style = style_regex.search(beer_description).group(0)
+
             if abv:
                 beer_stats['abv'] = abv
             if style:
                 beer_stats['style'] = style.strip()
+
             try:
                 beer_notes = unicode_to_ascii(beer.find('div', 'menu-item-price-bottom').get_text().strip()[1::])
                 logging.info("Notes found")
             except:
                 beer_notes = ""
                 logging.info("Notes not found")
+
         except AttributeError:
             logging.info("bad beer")
+
         if beer_name and beer_description and beer_notes and beer_stats:
             beer_dict = {"beer": beer_name, 
                          "description": beer_description, 
                          "summary": beer_description + " " + beer_notes, 
                          "notes": beer_notes, 
                          "stats": beer_stats}
+
             return_beers.append(beer_dict)
+
     return(return_beers, update_time)
     
 
