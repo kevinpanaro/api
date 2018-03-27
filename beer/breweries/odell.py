@@ -5,6 +5,7 @@ Purpose: Grabs Odell Beers on tap
 '''
 import logging
 from helpers.unicode_helper import unicode_to_ascii
+from helpers.url_pull import beautiful_url
 from helpers.save_beer import save_beer
 from bs4 import BeautifulSoup as bs
 from requests import get, Request, Session, cookies
@@ -13,22 +14,12 @@ from contextlib import closing
 BASE_URL = "https://www.odellbrewing.com/tap-room/"
 BREWERY = "Odell Brewing" 
 SAVE_FILE = "odell.json"
+COOKIE = ('odAccess', 'true', 'www.odellbrewing.com', '/')
 
 locations = ["800 East Lincoln Ave, Fort Collins, CO 80524"]
 
-def beautiful_url(url):
-    '''because a wall'''
-    jar = cookies.RequestsCookieJar()
-    jar.set('odAccess', 'true', domain='www.odellbrewing.com', path='/')
-    req = Request('GET', url, cookies=jar)
-    req = req.prepare()
-    s = Session()
-    r = s.send(req)
-    souped_url = bs(r.text, "html.parser")
-    return(souped_url)
-
 def get_beers_url(url):
-    html = beautiful_url(url)
+    html = beautiful_url(url, COOKIE)
     all_beers = html.find_all('p', {'class':'tap-beer'})
     beer_urls = []
     for url in html.find_all('p', {'class':'tap-beer'}):
@@ -44,7 +35,7 @@ def parse_url(url):
 
     for beer_url in beer_urls:
         beer_dict = {}
-        beer = beautiful_url(beer_url)
+        beer = beautiful_url(beer_url, COOKIE)
 
         beer_name = beer.find('div', {'class':'columns small-12 beer-title'}).get_text().strip()
 
@@ -82,6 +73,7 @@ def odell():
     logging.basicConfig(format=FORMAT,level=logLevel)
 
     output = []
+    cookie = ('odAccess', 'true', 'www.odellbrewing.com', '/')
     for location in locations:
         logging.info("Location: {}".format(location))
         beers = parse_url(BASE_URL)
