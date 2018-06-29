@@ -16,9 +16,10 @@ def get_beers_urls(url):
 
     html = beautiful_url(url)
 
-    possible_urls = html.find('ul', {'class': 'currently_available clearfix'})
+    all_beers_urls = re.findall("https://themayorofoldtown\.com/beers/.+?(?=\")", str(html))
 
-    all_beers_urls = [urls.find_all('a')[1]['href'] for urls in possible_urls.find_all('li')]
+   
+    # all_beers_urls = [urls.find_all('a')[1]['href'] for urls in possible_urls.find_all('li')]
 
     logging.debug("Found all beers. {} total".format(len(all_beers_urls)))
 
@@ -35,29 +36,29 @@ def parse_url(url):
         beer_dict = {}
         html = beautiful_url(beer)
 
-        beer_container = html.find('div', {'class': 'container'})
+        beer_name = unicode_to_ascii(html.find('h1', {'class':'beertitle'}).get_text())
 
-        beer_name = unicode_to_ascii(beer_container.find('h1').get_text())
+        logging.debug("Beer Found: {}".format(beer_name))
 
-        beer_desc_cont = beer_container.find('div', {'id': 'content-inner'})
+        beer_brewery = unicode_to_ascii(html.find('h2', {'class': 'brewerytitle'}).get_text())
 
-        try:
-            beer_description = unicode_to_ascii(beer_desc_cont.find('p').get_text())
-        except AttributeError:
-            logging.info("{} description hard to find. Trying again.".format(beer))
-            beer_description = unicode_to_ascii(beer_desc_cont.find('div').get_text())
+        logging.debug("Brewery Found: {}".format(beer_brewery))
 
-        logging.debug("Beer Description FOUND")
+        beer_style_abv = unicode_to_ascii(html.find('span', {'class': 'beerstyle'}).get_text())
 
-        beer_details = beer_container.find('div', {'id': 'sidebar-inner'})
+        beer_style, beer_abv = tuple(beer.strip() for beer in beer_style_abv.split("|"))
 
-        beer_details = ([detail.get_text().strip() for detail in beer_details.find_all('dd')])
+        logging.debug("Style Found: {}".format(beer_style))
 
-        style, abv, container_type = beer_details
+        logging.debug("ABV Found: {}".format(beer_abv))
 
-        beer_stats = {'style': style,
-                      'abv': abv.strip('%') + '%',
-                      'container_type': container_type}
+        beer_description = unicode_to_ascii(html.find('div', {'class': 'beer-description'}).get_text())
+
+        if beer_description: logging.debug("Description Found")
+
+        beer_stats = {'style': beer_style,
+                      'abv': beer_abv.strip('%') + '%',
+                      'brewery': beer_brewery}
 
         beer_dict = {"beer": beer_name,
                      "description": beer_description,
@@ -66,7 +67,7 @@ def parse_url(url):
         return_beers.append(beer_dict)
     return(return_beers)  
 
-def mayor_of_old_town():
+def mayorofoldtown():
 
     logLevel=logging.DEBUG
     FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
@@ -83,4 +84,4 @@ def mayor_of_old_town():
 
 
 if __name__ == '__main__':
-    mayor_of_old_town()
+    mayorofoldtown()
