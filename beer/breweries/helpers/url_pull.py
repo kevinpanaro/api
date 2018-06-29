@@ -12,9 +12,9 @@ def beautiful_url(url, cookie=False):
             req = Request('GET', url, cookies=jar)
             req = req.prepare()
             s = Session()
-            r = s.send(req)
-            if is_good_response(r):
-                souped_url = bs(r.text, "html.parser")
+            resp = s.send(req)
+            if is_good_response(resp):
+                souped_url = bs(resp.text, "html.parser")
                 return souped_url
             else:
                 return None
