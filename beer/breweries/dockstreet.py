@@ -43,8 +43,12 @@ def parse_url(url):
         ibu = ibu_regex.search(beer_description).group()
         logging.info("IBU found:     {}".format(ibu))
 
-        beer_style = style_regex.search(beer_description).group()
-        logging.info("Style found:   {}".format(beer_style))
+        try:
+            beer_style = style_regex.search(beer_description).group()
+            logging.info("Style found:   {}".format(beer_style))
+        except AttributeError:
+            logging.info("Style not found")
+            beer_style = None
 
         beer_stats = {"ibu": ibu,
                       "abv": abv}
