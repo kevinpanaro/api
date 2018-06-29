@@ -28,7 +28,10 @@ def parse_url(url):
     for beer in beers:
         beer_dict = {}
         beer_name = unicode_to_ascii(beer.find("h2", "beer-title").get_text())
-        beer_style = unicode_to_ascii(beer.find("h4", "beer-style").get_text())
+        try:
+            beer_style = unicode_to_ascii(beer.find("h4", "beer-style").get_text())
+        except:
+            continue # sometimes non-existant, skipping for now.
         beer_description = unicode_to_ascii(beer.find("div", "col col-1-3").get_text()).strip("\n")
 
         logging.info("Beer found:  {}".format(beer_name))
