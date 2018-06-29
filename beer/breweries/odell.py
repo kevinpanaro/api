@@ -8,8 +8,6 @@ from helpers.unicode_helper import unicode_to_ascii
 from helpers.url_pull import beautiful_url
 from helpers.save_beer import save_beer
 from bs4 import BeautifulSoup as bs
-from requests import get, Request, Session, cookies
-from contextlib import closing
 
 BASE_URL = "https://www.odellbrewing.com/tap-room/"
 BREWERY = "Odell Brewing" 
