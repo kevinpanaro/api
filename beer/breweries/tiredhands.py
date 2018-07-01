@@ -94,14 +94,19 @@ def tired_hands():
     FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
     logging.basicConfig(format=FORMAT,level=logLevel)
 
-    output = []
-    for location in locations:
-        logging.info("Location: {}".format(location))
-        location_url = BASE_URL.format(location)
-        beers, update_time = parse_url(location_url)
-        output.append({"location": location, "beers": beers, "update_time": update_time})
-    output = {"locations": output, "brewery": BREWERY}
-    save_beer(output, SAVE_FILE)
+    try:
+        output = []
+        for location in locations:
+            logging.info("Location: {}".format(location))
+            location_url = BASE_URL.format(location)
+            beers, update_time = parse_url(location_url)
+            output.append({"location": location, "beers": beers, "update_time": update_time})
+        output = {"locations": output, "brewery": BREWERY}
+        save_beer(output, SAVE_FILE)
+        
+        print("{} completed".format(BREWERY))
+    except:
+        logging.warn("{} failed.")
 
     
 

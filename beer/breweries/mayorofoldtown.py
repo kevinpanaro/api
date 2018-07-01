@@ -73,14 +73,20 @@ def mayorofoldtown():
     FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
     logging.basicConfig(format=FORMAT,level=logLevel)
 
-    output = []
-    for location in locations:
-        logging.info("Location: {}".format(location))
-        beers = parse_url(BASE_URL)
-        output.append({"location": location, "beers": beers})
 
-    output = {"brewery": BREWERY, "locations": output}
-    save_beer(output, SAVE_FILE)
+    try:
+        output = []
+        for location in locations:
+            logging.info("Location: {}".format(location))
+            beers = parse_url(BASE_URL)
+            output.append({"location": location, "beers": beers})
+
+        output = {"brewery": BREWERY, "locations": output}
+        save_beer(output, SAVE_FILE)
+
+        print("{} completed".format(BREWERY))
+    except:
+        logging.warn("{} failed.")
 
 
 if __name__ == '__main__':
