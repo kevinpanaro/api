@@ -59,7 +59,7 @@ class BeerCLI():
 
 	def search_menus(self):
 		print("Search Menus")
-		user_input = raw_input("  [l]ook up\n  [b]ack\n  [q]uit\n  ->").lower()
+		user_input = raw_input("  [l]ook up\n  [b]ack\n  [q]uit\n  -> ").lower()
 		if self.validate(user_input, 1):
 			if user_input == 'l':
 				print('lookup')
