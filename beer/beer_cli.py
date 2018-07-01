@@ -17,6 +17,7 @@ class BeerCLI():
 		print("Beer Command Line Interface")
 
 	def menu(self):
+		print("Main Menu")
 		user_input = raw_input("  [s]earch\n  [u]pdate\n  [q]uit\n -> ").lower()
 		if self.validate(user_input, 0):
 			print("handling {}".format(user_input))
@@ -36,7 +37,7 @@ class BeerCLI():
 			return ['s', 'u', 'q']
 
 		def search_menu():
-			return ['l', 'q']
+			return ['l', 'b', 'q']
 
 		options = {0: main_menu,
 				   1: search_menu,}
@@ -57,12 +58,18 @@ class BeerCLI():
 		self.menu()
 
 	def search_menus(self):
-		user_input = raw_input("  [l]ook up\n  [q]uit\n  ->").lower()
+		print("Search Menus")
+		user_input = raw_input("  [l]ook up\n  [b]ack\n  [q]uit\n  ->").lower()
 		if self.validate(user_input, 1):
 			if user_input == 'l':
 				print('lookup')
+			elif user_input == 'b':
+				self.menu()
 			elif user_input == 'q':
 				print('quit')
+		else:
+			print("Invalid selection")
+			self.search_menus()
 
 		# self.brewerys = [file for file in os.listdir(self.DIR_TAPS) if isfile(join(self.DIR_TAPS, file))]
 		# for num, brewery in enumerate(self.brewerys, start=1):
