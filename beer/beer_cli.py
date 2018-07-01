@@ -33,15 +33,15 @@ class BeerCLI():
 
 	def validate(self, user_input, menu_type):
 		def main_menu():
-			valid = ['s', 'u', 'q']
+			return ['s', 'u', 'q']
 
 		def search_menu():
-			valid = ['l', 'q']
+			return ['l', 'q']
 
-		options = {0, main_menu,
-				   1, search_menu,}
+		options = {0: main_menu,
+				   1: search_menu,}
 
-		options[menu_type]()
+		valid = options[menu_type]()
 
 		if user_input in valid:
 			return True
@@ -57,7 +57,7 @@ class BeerCLI():
 		self.menu()
 
 	def search_menus(self):
-		user_input = raw_input("  [l]ook up\n   [q]uit\n  ->").lower()
+		user_input = raw_input("  [l]ook up\n  [q]uit\n  ->").lower()
 		if self.validate(user_input, 1):
 			if user_input == 'l':
 				print('lookup')
