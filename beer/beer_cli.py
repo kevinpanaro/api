@@ -26,7 +26,7 @@ class BeerCLI():
 			elif user_input == 's':
 				self.search_menus()
 			elif user_input == "q":
-				print("bye now.")
+				self.quit()
 		else:
 			print("Invalid selection")
 			return self.menu()
@@ -37,7 +37,7 @@ class BeerCLI():
 			return ['s', 'u', 'q']
 
 		def search_menu():
-			return ['l', 'b', 'q']
+			return ['s', 'l', 'b', 'q']
 
 		options = {0: main_menu,
 				   1: search_menu,}
@@ -59,25 +59,35 @@ class BeerCLI():
 
 	def search_menus(self):
 		print("Search Menus")
-		user_input = raw_input("  [l]ook up\n  [b]ack\n  [q]uit\n  -> ").lower()
+		user_input = raw_input("  [s]earch\n  [l]ist breweries\n  [b]ack\n  [q]uit\n  -> ").lower()
 		if self.validate(user_input, 1):
-			if user_input == 'l':
-				print('lookup')
+			if user_input == 's':
+				print("search")
+			elif user_input == 'l':
+				print('list')
+				self.list_breweries()
 			elif user_input == 'b':
 				self.menu()
 			elif user_input == 'q':
-				print('quit')
+				self.quit()
 		else:
 			print("Invalid selection")
 			self.search_menus()
 
-		# self.brewerys = [file for file in os.listdir(self.DIR_TAPS) if isfile(join(self.DIR_TAPS, file))]
-		# for num, brewery in enumerate(self.brewerys, start=1):
-		# 	brewery_name = brewery.split('.')[0].split('_').title()
-		# 	brewery_name = " ".join(brewery_name).title()
+	def list_breweries(self):
+
+		self.brewerys = [file for file in os.listdir(self.DIR_TAPS) if isfile(join(self.DIR_TAPS, file))]
+		for num, brewery in enumerate(self.brewerys, start=1):
+			brewery_name = brewery.split('.')[0].split('_')
+			brewery_name = " ".join(brewery_name).title()
+			print(" [{}] {}".format(num, brewery_name))
+
+		self.search_menus()
 
 
 		
+	def quit(self):
+		print("bye.")
 
 
 
