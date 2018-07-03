@@ -15,7 +15,7 @@ class DevonLanes(Bowling):
         self.contact_url = "".join([self.base_url, contact])
         self.contact_info()
         self.hours()
-        # Bowling.__init__(self, self.name, self.address, self.phone, hours)
+        Bowling.__init__(self, self.name, self.address, self.phone, self.hours)
 
     def contact_info(self):
 
@@ -38,9 +38,19 @@ class DevonLanes(Bowling):
         devon_lanes_html = beautiful_url(self.base_url)
 
         hours = devon_lanes_html.find("div", {"class": "tve_cb_cnt tve_empty_dropzone"})
-        print(hours.find("strong").get_text())
+        list_of_hours = (str(hours).split('strong'))
 
-        
+        hours = {'Monday': ["11:00", "00:00"],
+                 'Tuesday': ["09:00", "23:00"],
+                 'Wednesday': ["09:00", "23:00"],
+                 'Thursday': ["11:00", "00:00"],
+                 'Friday': ["11:00", "00:00"],
+                 'Saturday': ["10:00", "00:00"],
+                 'Sunday': ["10:00", "22:00"],
+                 }
+
+        self.hours = hours
+
 def devon_lanes():
     return(DevonLanes())
 
