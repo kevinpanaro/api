@@ -11,3 +11,9 @@ because there are some things I'd like api's for when the provider doesn't suppl
 - [Equinox](https://equinoxbrewing.com/), Beer here is good, and I go there for beer.
 - [Odell](https://www.odellbrewing.com/), beer
 - [Mayor of Old Town](https://themayorofoldtown.com/beer/), similar to Monks, so many good beers on tap, not a brewery.
+
+#### bowling
+- [Devon Lanes](https://devonlanes.com/)
+
+##### notes
+I created a basic class for the [bowling](https://github.com/kevinpanaro/api/blob/master/bowling/lanes/bowling.py) category. It makes it easier to access important information, if I were to create some kind of UI for something. I will most do something similar to the beers in the future, because it seems to work pretty well.
