@@ -1,7 +1,7 @@
 import os
 import json
 
-def save_beer(data, file_name):
+def save_lanes(data, file_name):
     path = os.path.dirname(os.path.realpath(__file__))
 
     save_path = os.path.join(path, "../../specials", file_name)
