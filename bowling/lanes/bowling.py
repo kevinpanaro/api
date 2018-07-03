@@ -15,37 +15,48 @@ class InvalidPhoneNumber(Exception):
 
 class Bowling():
     def __init__(self, name, address, phone, hours={}):
+        '''initializes and validates all inputs'''
         self.name = name
         self.address = address
-        self.phone = self.validate_phone(phone)
-        self.hours = self.validate_lane_hours(hours)
+        self.phone = self._validate_phone(phone)
+        self.hours = self._validate_lane_hours(hours)
+
 
 
     def set_hours(self, hours):
-        self.hours = self.validate_lane_hours(hours)
+        '''sets the hours given a json'''
+        self.hours = self._validate_lane_hours(hours)
 
     def get_hours(self, day=None):
+        '''given 'day', returns hours for that day,
+        or returns all the hours'''
         if day:
             return(self.hours[day])
         else:
             return(self.hours)
 
     def __repr__(self):
+        '''returns the name of the Lanes'''
         return(self.name)
 
     def get_name(self):
+        '''returns the name of the Lanes'''
         return(self.name)
 
     def get_address(self):
+        '''returns the address of the Lanes'''
         return(self.address)
 
     def set_phone_number(self, phone):
-        self.phone = self.validate_phone(phone)
+        '''sets the phone number of the lanes'''
+        self.phone = self._validate_phone(phone)
 
     def get_phone_number(self):
+        '''returns the Lanes phone number'''
         return(self.phone)
 
     def save_hours(self):
+        '''saves the hours using save_lanes.py'''
         data = {"name": self.name,
                 "address": self.address,
                 "phone": self.phone,
@@ -54,7 +65,7 @@ class Bowling():
         file_name = "_".join(self.name.split(" ")) + '.json'
         save_lanes(data, file_name.lower())
 
-    def validate_phone(self, phone):
+    def _validate_phone(self, phone):
         ''' validates the phone number '''
         phone_number = ""
         for char in list(phone):
@@ -65,7 +76,7 @@ class Bowling():
         else:
             raise InvalidPhoneNumber()
 
-    def validate_lane_hours(self, hours):
+    def _validate_lane_hours(self, hours):
         ''' validates the hours dictionary'''
 
         def validate_hours(times, day):
