@@ -10,14 +10,15 @@ class DevonLanes(Bowling):
 
 
     def __init__(self):
+        '''self initializes, for devon lanes'''
         self.base_url = "https://devonlanes.com/"
         contact = "contact-location"
         self.contact_url = "".join([self.base_url, contact])
-        self.contact_info()
-        self.hours()
+        self._contact_info()
+        self._hours()
         Bowling.__init__(self, self.name, self.address, self.phone, self.hours)
 
-    def contact_info(self):
+    def _contact_info(self):
 
         contact_html = beautiful_url(self.contact_url)
 
@@ -33,7 +34,7 @@ class DevonLanes(Bowling):
         self.address = address
         self.phone = phone
 
-    def hours(self):
+    def _hours(self):
 
         devon_lanes_html = beautiful_url(self.base_url)
 
