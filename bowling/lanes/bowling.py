@@ -1,3 +1,6 @@
+import logging
+from helpers.save_lanes import save_lanes
+
 class InvalidHoursFormat(Exception):
     pass
 
@@ -42,7 +45,14 @@ class Bowling():
     def get_phone_number(self):
         return(self.phone)
 
+    def save_hours(self):
+        data = {"name": self.name,
+                "address": self.address,
+                "phone": self.phone,
+                "hours": self.hours}
 
+        file_name = "_".join(self.name.split(" ")) + '.json'
+        save_lanes(data, file_name.lower())
 
     def validate_phone(self, phone):
         ''' validates the phone number '''
@@ -63,7 +73,9 @@ class Bowling():
             start, stop = times
             start = datetime.strptime(start, "%H:%M")
             stop = datetime.strptime(stop, "%H:%M")
-            if start < stop:
+            if stop == datetime(1900, 1, 1, 0, 0):
+                return True
+            elif start < stop:
                 return True
             else:
                 raise InvalidHours("Start time is before stop time for {}".format(day))
