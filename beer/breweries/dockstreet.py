@@ -7,7 +7,6 @@ import logging
 import re
 from datetime import date
 from helpers.url_pull import beautiful_url
-from helpers.unicode_helper import unicode_to_ascii
 from helpers.save_beer import save_beer
 
 BASE_URL = "http://www.dockstreetbeer.com/whats-on-tap/"
@@ -30,10 +29,10 @@ def parse_url(url):
     for beer in beers:
         beer_dict = {}
 
-        beer_name = unicode_to_ascii(beer.find("div", "menu-item-title").get_text()).title().strip()
+        beer_name = beer.find("div", "menu-item-title").get_text().title().strip()
         logging.info("Beer found:    {}".format(beer_name))
 
-        beer_description = unicode_to_ascii(beer.find("div", "menu-item-description").get_text()).strip()
+        beer_description = beer.find("div", "menu-item-description").get_text().strip()
         if beer_description:
             logging.info("Beer descripton:  FOUND")
 
@@ -85,7 +84,7 @@ def dock_street():
 
         print("{} completed".format(BREWERY))
     except:
-        logging.warn("{} failed.")
+        logging.warning("{} failed.")
 
 
 if __name__ == '__main__':

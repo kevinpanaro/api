@@ -6,7 +6,6 @@ Note:    Someone fix this horrible website design
 '''
 import logging
 from helpers.url_pull import beautiful_url
-from helpers.unicode_helper import unicode_to_ascii
 from helpers.save_beer import save_beer
 
 BASE_URL = "https://equinoxbrewing.com/"
@@ -30,7 +29,7 @@ def parse_url(url):
         beer_dict = {}
         beer = beautiful_url(beer_url)
 
-        beer_name = unicode_to_ascii(beer.find('h1', {'class': 'entry-title'}).get_text())
+        beer_name = beer.find('h1', {'class': 'entry-title'}).get_text()
 
         logging.debug("Beer Found: {}".format(beer_name))
 
@@ -38,23 +37,30 @@ def parse_url(url):
 
         beer_description, beer_details = (beer_details.find_all('p'))
 
-        beer_description = unicode_to_ascii(beer_description.get_text())
+        beer_description = beer_description.get_text()
 
         logging.debug("Beer descripton:  FOUND")
 
-        beer_details = unicode_to_ascii(beer_details.get_text()).split("|")
+        beer_details = beer_details.get_text().split("|")
+        logging.debug(beer_details)
 
         beer_stats = {}
 
         for stat in beer_details:
             stat = stat.strip()
-            stat, data = (stat.split(":"))
+            try:
+                stat, data = (stat.split(":"))
+            except:
+                logging.info(f"{stat} has too many :")
+                continue
             stat = stat.replace(" ", "_")
             beer_stats[stat.lower()] = data.strip()
+  
+        logging.debug(beer_stats) 
 
         beer_dict = {"beer": beer_name,
                      "description": beer_description,
-                     "stats": beer_stats}     
+                     "stats": beer_stats}
 
         return_beers.append(beer_dict)
     return(return_beers)   
@@ -78,7 +84,7 @@ def equinox():
 
         print("{} completed".format(BREWERY))
     except:
-        logging.warn("{} failed.")
+        logging.warning("{} failed.")
 
 if __name__ == '__main__':
     equinox()

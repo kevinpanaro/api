@@ -9,7 +9,6 @@ TODO: Something is weird with their menu. All the beers scraped are more
 '''
 import logging
 from helpers.url_pull import beautiful_url
-from helpers.unicode_helper import unicode_to_ascii
 from helpers.save_beer import save_beer
 
 BASE_URL = "http://evilgeniusbeer.com/beers/"
@@ -27,12 +26,12 @@ def parse_url(url):
 
     for beer in beers:
         beer_dict = {}
-        beer_name = unicode_to_ascii(beer.find("h2", "beer-title").get_text())
+        beer_name = beer.find("h2", "beer-title").get_text()
         try:
-            beer_style = unicode_to_ascii(beer.find("h4", "beer-style").get_text())
+            beer_style = beer.find("h4", "beer-style").get_text()
         except:
             continue # sometimes non-existant, skipping for now.
-        beer_description = unicode_to_ascii(beer.find("div", "col col-1-3").get_text()).strip("\n")
+        beer_description = beer.find("div", "col col-1-3").get_text().strip("\n")
 
         logging.info("Beer found:  {}".format(beer_name))
         logging.info("Style:       {}".format(beer_style))
@@ -83,7 +82,7 @@ def evil_genius():
 
         print("{} completed".format(BREWERY))
     except:
-        logging.warn("{} failed.")
+        logging.warning("{} failed.")
 
 if __name__ == '__main__':
     evil_genius()

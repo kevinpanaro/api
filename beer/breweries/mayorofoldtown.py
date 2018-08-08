@@ -2,7 +2,6 @@ import logging
 import re
 from datetime import date
 from helpers.url_pull import beautiful_url
-from helpers.unicode_helper import unicode_to_ascii
 from helpers.save_beer import save_beer
 
 
@@ -36,15 +35,15 @@ def parse_url(url):
         beer_dict = {}
         html = beautiful_url(beer)
 
-        beer_name = unicode_to_ascii(html.find('h1', {'class':'beertitle'}).get_text())
+        beer_name = html.find('h1', {'class':'beertitle'}).get_text()
 
         logging.debug("Beer Found: {}".format(beer_name))
 
-        beer_brewery = unicode_to_ascii(html.find('h2', {'class': 'brewerytitle'}).get_text())
+        beer_brewery = html.find('h2', {'class': 'brewerytitle'}).get_text().strip()
 
         logging.debug("Brewery Found: {}".format(beer_brewery))
 
-        beer_style_abv = unicode_to_ascii(html.find('span', {'class': 'beerstyle'}).get_text())
+        beer_style_abv = html.find('span', {'class': 'beerstyle'}).get_text()
 
         beer_style, beer_abv = tuple(beer.strip() for beer in beer_style_abv.split("|"))
 
@@ -52,7 +51,7 @@ def parse_url(url):
 
         logging.debug("ABV Found: {}".format(beer_abv))
 
-        beer_description = unicode_to_ascii(html.find('div', {'class': 'beer-description'}).get_text())
+        beer_description = html.find('div', {'class': 'beer-description'}).get_text().strip()
 
         if beer_description: logging.debug("Description Found")
 
@@ -86,7 +85,7 @@ def mayorofoldtown():
 
         print("{} completed".format(BREWERY))
     except:
-        logging.warn("{} failed.")
+        logging.warning("{} failed.")
 
 
 if __name__ == '__main__':

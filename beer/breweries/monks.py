@@ -13,7 +13,6 @@ import logging
 import re
 from datetime import date
 from helpers.url_pull import beautiful_url
-from helpers.unicode_helper import unicode_to_ascii
 from helpers.save_beer import save_beer
 
 BASE_URL = "http://www.monkscafe.com/on-tap/"
@@ -37,13 +36,13 @@ def parse_url(url):
     beer_descriptions_list = []
 
     for beer_name in beer_names:
-        beer_name = unicode_to_ascii(beer_name.get_text())
+        beer_name = beer_name.get_text()
 
         if beer_name.strip() != "":
             beer_name_list.append(beer_name)
 
     for beer_description in beer_descriptions:
-        beer_description = unicode_to_ascii(beer_description.get_text())
+        beer_description = beer_description.get_text()
 
         if beer_description.strip() != "":
             beer_descriptions_list.append(beer_description)
@@ -94,7 +93,7 @@ def monks():
         
         print("{} completed".format(BREWERY))
     except:
-        logging.warn("{} failed.")
+        logging.warning("{} failed.")
 
 if __name__ == '__main__':
     monks()

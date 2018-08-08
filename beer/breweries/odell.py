@@ -4,7 +4,6 @@ Date:    3.21.18
 Purpose: Grabs Odell Beers on tap
 '''
 import logging
-from helpers.unicode_helper import unicode_to_ascii
 from helpers.url_pull import beautiful_url
 from helpers.save_beer import save_beer
 from bs4 import BeautifulSoup as bs
@@ -39,12 +38,12 @@ def parse_url(url):
 
         logging.debug("Beer Found: {}".format(beer_name))
 
-        beer_description = unicode_to_ascii(beer.find('div', {'class':'beer-content'}).get_text())
+        beer_description = beer.find('div', {'class':'beer-content'}).get_text()
 
         if beer_description:
             logging.debug("Description: Found")
         else:
-            logging.warn("No Description Found")
+            logging.warning("No Description Found")
 
         beer_details = beer.find_all('div', {'class':'columns small-12 medium-12'})
 
@@ -83,7 +82,7 @@ def odell():
         
         print("{} completed".format(BREWERY))
     except:
-        logging.warn("{} failed.")
+        logging.warning("{} failed.")
 
 if __name__ == '__main__':
     odell()
