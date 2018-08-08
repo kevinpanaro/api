@@ -1,24 +1,22 @@
 '''
 Used basically as a main
 '''
-from breweries.evilgenius import evil_genius
-from breweries.tiredhands import tired_hands
-from breweries.dockstreet import dock_street
-from breweries.monks import monks
-from breweries.equinox import equinox
-from breweries.odell import odell
-from breweries.mayorofoldtown import mayorofoldtown
+
+from breweries import *
+# from breweries.threefourbeerco import threefourbeerco
+# from breweries.tiredhands_class import TiredHands
 
 
 def pour_beer():
     '''pour beer into the taps, heh...'''
-    evil_genius()
-    tired_hands()
     dock_street()
     equinox()
-    odell()
+    evil_genius()
     mayorofoldtown()
-    # monks() # a later thing
+    monks()
+    odell()
+    tired_hands()
+    # TiredHands().update()
 
 if __name__ == '__main__':
     pour_beer()
