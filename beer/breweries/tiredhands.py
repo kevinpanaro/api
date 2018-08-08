@@ -2,8 +2,8 @@ import logging
 import re
 from datetime import date
 from helpers.url_pull import beautiful_url
-from helpers.unicode_helper import unicode_to_ascii
 from helpers.save_beer import save_beer
+from helpers.breweries import Brewery
 
 
 BASE_URL = "http://www.tiredhands.com/{}/beers/"
@@ -18,24 +18,30 @@ def parse_url(url):
     kill = ["***Other Beverages***", "***Sunday Brunch Beverages***"]
     return_beers = []
 
-    year = date.today().strftime('%y')
-    update_time_regex = re.compile("\d+/\d+/\d+".format(year))
+    update_time_regex = re.compile('\d+/\d+/\d+')
 
     data = beautiful_url(url)
+    
+
     try:
         update_time = data.find('div', 'sqs-block html-block sqs-block-html')
+
     except AttributeError:
         logging.info("AttributeError, but trying again")
         parse_url(url)
 
+
     try:
-        update_time = unicode_to_ascii(update_time.text)
+        update_time = update_time
     except UnboundLocalError:
-        logging.warn("UnboundLocalError, but skipping")
-    update_time = update_time_regex.search(update_time).group(0)
+        logging.warning("UnboundLocalError, but skipping")
+
+    update_time = update_time_regex.search(update_time.text).group(0)
+
     logging.info("Update date: {}".format(update_time))
 
     beers = data.find_all('div', 'menu-item')
+
     
     for beer in beers:
         abv_regex = re.compile('([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%')
@@ -48,13 +54,13 @@ def parse_url(url):
         beer_stats = {}
 
         try:
-            beer_name = unicode_to_ascii(beer.find('div', 'menu-item-title').get_text().strip(':'))
+            beer_name = beer.find('div', 'menu-item-title').get_text().strip().strip(":")
             if beer_name in kill:
                 logging.info("All beer found")
                 break
             logging.info("Beer found: {}".format(beer_name))
 
-            beer_description = unicode_to_ascii(beer.find('div', 'menu-item-description').get_text().strip())
+            beer_description = beer.find('div', 'menu-item-description').get_text().strip()
             logging.info("Description found")
 
             abv = abv_regex.search(beer_description).group(0)
@@ -66,7 +72,7 @@ def parse_url(url):
                 beer_stats['style'] = style.strip()
 
             try:
-                beer_notes = unicode_to_ascii(beer.find('div', 'menu-item-price-bottom').get_text().strip()[1::])
+                beer_notes = beer.find('div', 'menu-item-price-bottom').get_text().strip()[1::]
                 logging.info("Notes found")
             except:
                 beer_notes = ""
@@ -105,8 +111,8 @@ def tired_hands():
         save_beer(output, SAVE_FILE)
         
         print("{} completed".format(BREWERY))
-    except:
-        logging.warn("{} failed.")
+    except Exception as e:
+        logging.warning(f"{e} failed.")
 
     
 
