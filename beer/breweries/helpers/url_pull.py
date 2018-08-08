@@ -32,3 +32,5 @@ def is_good_response(resp):
     return (resp.status_code == 200
             and content_type is not None
             and content_type.find('html') > -1)
+
+
