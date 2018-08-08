@@ -8,8 +8,10 @@ TODO: Something is weird with their menu. All the beers scraped are more
       selling on the side, but I don't think I want to change it.
 '''
 import logging
-from helpers.url_pull import beautiful_url
-from helpers.save_beer import save_beer
+try:
+    from helpers import *
+except:
+    from .helpers import *
 
 BASE_URL = "http://evilgeniusbeer.com/beers/"
 BREWERY = "Evil Genius Brewery"

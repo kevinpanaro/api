@@ -4,9 +4,11 @@ Date:    3.21.18
 Purpose: Grabs Odell Beers on tap
 '''
 import logging
-from helpers.url_pull import beautiful_url
-from helpers.save_beer import save_beer
-from bs4 import BeautifulSoup as bs
+
+try:
+    from helpers import *
+except:
+    from .helpers import *
 
 BASE_URL = "https://www.odellbrewing.com/tap-room/"
 BREWERY = "Odell Brewing" 

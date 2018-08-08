@@ -1,9 +1,11 @@
 import logging
 import re
 from datetime import date
-from helpers.url_pull import beautiful_url
-from helpers.save_beer import save_beer
-from helpers.breweries import Brewery
+
+try:
+    from helpers import *
+except:
+    from .helpers import *
 
 
 BASE_URL = "http://www.tiredhands.com/{}/beers/"
@@ -114,7 +116,6 @@ def tired_hands():
     except Exception as e:
         logging.warning(f"{e} failed.")
 
-    
 
 if __name__ == '__main__':
     tired_hands()

@@ -12,8 +12,11 @@ continuous.
 import logging
 import re
 from datetime import date
-from helpers.url_pull import beautiful_url
-from helpers.save_beer import save_beer
+
+try:
+    from helpers import *
+except:
+    from .helpers import *
 
 BASE_URL = "http://www.monkscafe.com/on-tap/"
 BREWERY = "Monk's Cafe" # not a brewery just a BASE_URL

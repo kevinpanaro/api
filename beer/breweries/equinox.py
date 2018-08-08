@@ -5,8 +5,11 @@ Purpose: Grabs Equinox Beers on tap
 Note:    Someone fix this horrible website design
 '''
 import logging
-from helpers.url_pull import beautiful_url
-from helpers.save_beer import save_beer
+
+try:
+    from helpers import *
+except:
+    from .helpers import *
 
 BASE_URL = "https://equinoxbrewing.com/"
 BREWERY = "Equinox Brewing" 
