@@ -1,7 +1,11 @@
-from .url_pull import beautiful_url
-from .save_beer import save_beer
+from .helpers import (
+    beautiful_url,
+    save_beer,
+    format_beer_dict
+    )
 
 __all__ = [
            "beautiful_url", 
            "save_beer",
+           "format_beer_dict",
            ]
