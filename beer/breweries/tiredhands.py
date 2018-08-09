@@ -23,7 +23,6 @@ def parse_url(url):
     update_time_regex = re.compile('\d+/\d+/\d+')
 
     data = beautiful_url(url)
-    
 
     try:
         update_time = data.find('div', 'sqs-block html-block sqs-block-html')
@@ -31,7 +30,6 @@ def parse_url(url):
     except AttributeError:
         logging.info("AttributeError, but trying again")
         parse_url(url)
-
 
     try:
         update_time = update_time
@@ -44,7 +42,6 @@ def parse_url(url):
 
     beers = data.find_all('div', 'menu-item')
 
-    
     for beer in beers:
         abv_regex = re.compile('([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%')
         style_regex = re.compile('[\D]+')
@@ -90,26 +87,23 @@ def parse_url(url):
                 logging.info("Notes not found")
 
             beer_description = beer_description + " " + beer_notes
-            
-            beer_dict = format_beer_dict(beer_name = beer_name,
+
+            beer_dict = format_beer_dict(beer_name        = beer_name,
                                          beer_description = beer_description,
-                                         beer_brewery = beer_brewery, 
-                                         beer_abv = beer_abv, 
-                                         beer_ibu = beer_ibu,
-                                         beer_hops = beer_hops,
-                                         beer_malts = beer_malts,
-                                         beer_avail = beer_avail,
-                                         beer_style = beer_style,)
+                                         beer_brewery     = beer_brewery,
+                                         beer_abv         = beer_abv,
+                                         beer_ibu         = beer_ibu,
+                                         beer_hops        = beer_hops,
+                                         beer_malts       = beer_malts,
+                                         beer_avail       = beer_avail,
+                                         beer_style       = beer_style,)
 
             return_beers.append(beer_dict)
 
         except AttributeError:
             logging.info("bad beer")
 
-
-
     return(return_beers, update_time)
-    
 
 
 def tired_hands():
