@@ -26,17 +26,20 @@ def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
             req = req.prepare()
             s = Session()
             resp = s.send(req)
+
             if is_good_response(resp):
                 souped_url = bs(resp.text, "html.parser")
                 return souped_url
             else:
                 return None
+
         with closing(get(url)) as resp:
             if is_good_response(resp):
                 souped_url = bs(resp.text, "html.parser")
                 return souped_url
             else:
                 return None
+
     except Exception as e:
         print(e)
 
@@ -165,7 +168,6 @@ def format_beer_dict(beer_name: str, beer_description: str,
               "pilsener", "pilsner", "pils", "porter", "red ale", "roggenbier", "saison", 
               "scotch ale", "stout", "schwarzbier", "vienna lager", "witbier", 
               "weissbier", "weizenbock"]
-
     
     REGEX = {"beer_abv": re.compile("([\d]+\.[\d]\s*|[\d]+\s*)(?=%)"),
              "beer_style": re.compile("[\D]+"),
@@ -186,7 +188,6 @@ def format_beer_dict(beer_name: str, beer_description: str,
                     search_term.append(item.group(0))
             return search_term
 
-
     try:
         beer_abv = float(beer_abv.strip().strip("%"))
     except:
@@ -203,8 +204,6 @@ def format_beer_dict(beer_name: str, beer_description: str,
 
     beer_style = search_description(beer_style, STYLES, beer_description)
 
-
-
     beer_dict = {
                     "beer": beer_name,
                     "description": beer_description,
@@ -219,4 +218,5 @@ def format_beer_dict(beer_name: str, beer_description: str,
                             "style": beer_style,
                         },
                 }
+
     return(beer_dict)
