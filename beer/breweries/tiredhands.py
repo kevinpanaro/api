@@ -55,6 +55,14 @@ def parse_url(url):
         beer_notes = None
         beer_stats = {}
 
+        beer_brewery = "Tired Hands Brewery" # everything served here is by Tired Hands
+        beer_abv = None
+        beer_ibu = None
+        beer_hops = []
+        beer_malts = []
+        beer_avail = []
+        beer_style = []
+
         try:
             beer_name = beer.find('div', 'menu-item-title').get_text().strip().strip(":")
             if beer_name in kill:
@@ -69,9 +77,10 @@ def parse_url(url):
             style = style_regex.search(beer_description).group(0)
 
             if abv:
-                beer_stats['abv'] = abv
+                beer_abv = abv
+
             if style:
-                beer_stats['style'] = style.strip()
+                beer_style = style.strip()
 
             try:
                 beer_notes = beer.find('div', 'menu-item-price-bottom').get_text().strip()[1::]
@@ -80,17 +89,24 @@ def parse_url(url):
                 beer_notes = ""
                 logging.info("Notes not found")
 
+            beer_description = beer_description + " " + beer_notes
+            
+            beer_dict = format_beer_dict(beer_name = beer_name,
+                                         beer_description = beer_description,
+                                         beer_brewery = beer_brewery, 
+                                         beer_abv = beer_abv, 
+                                         beer_ibu = beer_ibu,
+                                         beer_hops = beer_hops,
+                                         beer_malts = beer_malts,
+                                         beer_avail = beer_avail,
+                                         beer_style = beer_style,)
+
+            return_beers.append(beer_dict)
+
         except AttributeError:
             logging.info("bad beer")
 
-        if beer_name and beer_description and beer_notes and beer_stats:
-            beer_dict = {"beer": beer_name, 
-                         "description": beer_description, 
-                         "summary": beer_description + " " + beer_notes, 
-                         "notes": beer_notes, 
-                         "stats": beer_stats}
 
-            return_beers.append(beer_dict)
 
     return(return_beers, update_time)
     
@@ -109,7 +125,7 @@ def tired_hands():
             location_url = BASE_URL.format(location)
             beers, update_time = parse_url(location_url)
             output.append({"location": location, "beers": beers, "update_time": update_time})
-        output = {"locations": output, "brewery": BREWERY}
+        output = {"locations": output, "establishment": BREWERY}
         save_beer(output, SAVE_FILE)
         
         print("{} completed".format(BREWERY))
