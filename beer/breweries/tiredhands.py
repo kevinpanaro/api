@@ -42,7 +42,7 @@ def parse_url(url):
 
     beers = data.find_all('div', 'menu-item')
 
-    for beer in beers:
+    for _id, beer in enumerate(beers, start = 1):
         abv_regex = re.compile('([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%')
         style_regex = re.compile('[\D]+')
 
@@ -88,7 +88,9 @@ def parse_url(url):
 
             beer_description = beer_description + " " + beer_notes
 
-            beer_dict = format_beer_dict(beer_name        = beer_name,
+            beer_dict = format_beer_dict(_id              = _id,
+                                         _type            = "beer",
+                                         beer_name        = beer_name,
                                          beer_description = beer_description,
                                          beer_brewery     = beer_brewery,
                                          beer_abv         = beer_abv,
@@ -114,12 +116,16 @@ def tired_hands():
 
     try:
         output = []
-        for location in locations:
+        for _id, location in enumerate(locations, start = 1):
             logging.info("Location: {}".format(location))
             location_url = BASE_URL.format(location)
             beers, update_time = parse_url(location_url)
-            output.append({"location": location, "beers": beers, "update_time": update_time})
-        output = {"locations": output, "establishment": BREWERY}
+            output.append({"location": location, 
+                           "beers": beers, 
+                           "update_time": update_time,
+                           "id": _id,
+                           "type": "location"})
+        output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
         
         print("{} completed".format(BREWERY))
