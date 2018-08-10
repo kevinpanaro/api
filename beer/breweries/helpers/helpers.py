@@ -2,7 +2,7 @@ import os
 import json
 import re
 from bs4 import BeautifulSoup as bs
-from requests import get, Request, Session, cookies
+import requests
 from contextlib import closing
 
 def b_id():
@@ -35,21 +35,26 @@ def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
         
     try:
         if cookie:
-            name, content, domain, path = cookie
-            jar = cookies.RequestsCookieJar()
-            jar.set(name, content, domain=domain, path=path) 
-            req = Request("GET", url, cookies=jar)
-            req = req.prepare()
-            s = Session()
-            resp = s.send(req)
+            # name, content, domain, path = cookie
+            # jar = cookies.RequestsCookieJar()
+            # jar.set(name=name, value=content, domain=domain, path=path)
+            cookiejar = requests.cookies.RequestsCookieJar()
+            cookiejar.set(name="odAccess", value="true", domain="www.odellbrewing.com", path="/")
+            req = requests.Request(method="GET", url=url, cookies=cookiejar)
 
+            prepared_req = req.prepare()
+            
+            s = requests.Session()
+            resp = s.send(prepared_req)
+            # print(resp)
             if is_good_response(resp):
                 souped_url = bs(resp.text, "html.parser")
+
                 return souped_url
             else:
                 return None
 
-        with closing(get(url)) as resp:
+        with closing(requests.get(url)) as resp:
             if is_good_response(resp):
                 souped_url = bs(resp.text, "html.parser")
                 return souped_url
@@ -86,7 +91,7 @@ def format_beer_dict(_id: int, _type: str,
                      beer_hops: list = [],
                      beer_malts: list = [], 
                      beer_avail: list = [],
-                     beer_style: str = []) -> dict:
+                     beer_style: list = []) -> dict:
     """
     This takes all information collected and formats 
     the data so that it is the same format for all 
@@ -187,10 +192,10 @@ def format_beer_dict(_id: int, _type: str,
               "flanders red ale", "golden ale", "summer ale", "gose", "gueuze", 
               "hefeweizen", "helles", "india pale ale", "ipa", "kölsch", "lambic", 
               "light ale", "maibock", "helles bock", "malt liquor", "mild", 
-              "oktoberfestbier", "märzenbier", "old ale", "oud bruin", "pale ale", 
+              "oatmeal stout", "oktoberfestbier", "märzenbier", "old ale", "oud bruin", "pale ale", 
               "pilsener", "pilsner", "pils", "porter", "red ale", "roggenbier", "saison", 
-              "scotch ale", "stout", "schwarzbier", "vienna lager", "witbier", 
-              "weissbier", "weizenbock"]
+              "scotch ale", "scottish ale", "stout", "schwarzbier", "vienna lager", "witbier", 
+              "weissbier", "weizenbock", "strong ale", ]
     
     REGEX = {"beer_abv": re.compile("([\d]+\.[\d]\s*|[\d]+\s*)(?=%)"),
              "beer_style": re.compile("[\D]+"),
@@ -204,19 +209,46 @@ def format_beer_dict(_id: int, _type: str,
         if search_term:
             return search_term
         else:
-            for item in search_bank:
-                regex = re.compile(item + "(?=[\W])")
+            for item in search_bank:# ([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%
+                regex = re.compile(item + "(?=[\W])|(?<=[\W])" + item)
                 item = regex.search(beer_description.lower())
                 if item:
                     search_term.append(item.group(0))
             return search_term
 
-    try:
-        beer_abv = float(beer_abv.strip().strip("%"))
-    except:
-        beer_abv = float(REGEX["beer_abv"].search(beer_description).group(0).strip())
+    def style_cleaner(beer_style: list) -> str:
+        """
+        most beers fall under one category.
+        this will help with cleaning up a beer 
+        thats ['api', 'double ipa'] when it's really just
+        a ['double api']
+        """
+        if not beer_style:
+            return(beer_style)
+        dupes = []
+        beer_style_copy = beer_style[:]
+        for style in beer_style:
+            for style_copy in beer_style_copy:
+                if style != style_copy:
+                    if style in style_copy:
+                        dupes.append(style)
 
-    if beer_ibu == None:
+        for dupe in dupes:
+            beer_style.remove(dupe)
+
+        return(beer_style[0])
+
+
+    try:
+        try:
+            beer_abv = float(beer_abv.strip().strip("%"))
+        except AttributeError:
+            beer_abv = float(REGEX["beer_abv"].search(beer_description).group(0).strip())
+    except:
+        beer_abv = None
+
+    # I have no way to implement this right now
+    if beer_ibu:
         pass
 
     beer_hops = search_description(beer_hops, HOPS, beer_description)
@@ -225,7 +257,14 @@ def format_beer_dict(_id: int, _type: str,
 
     beer_avail = search_description(beer_avail, AVAILABILITY, beer_description)
 
-    beer_style = search_description(beer_style, STYLES, beer_description)
+    beer_style_from_name = search_description(beer_style, STYLES, beer_name)
+
+    if beer_style_from_name:
+        beer_style = beer_style_from_name
+    else:
+        beer_style = search_description(beer_style, STYLES, beer_description)
+
+    beer_style = style_cleaner(beer_style)
 
     beer_dict = {
                     "id": _id,
