@@ -5,6 +5,22 @@ from bs4 import BeautifulSoup as bs
 from requests import get, Request, Session, cookies
 from contextlib import closing
 
+def b_id():
+    """ 
+    Theres a better way to do this, but
+    for now it's hard coded, shoot me.
+    """
+    brewery_id = {"Tired Hands Brewery": 1,
+                "Equinox Brewing": 2,
+                "Dock Street": 3,
+                "Evil Genius Brewery": 4,
+                "The Mayor of Old Town": 5,
+                "Monk's Cafe": 6,
+                "Odell Brewing": 7}
+
+    return(brewery_id)
+
+
 def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
     """
     simple url grab but also closes 
@@ -61,10 +77,15 @@ def save_beer(data: dict, file_name: str) -> None:
         f.write(json.dumps(data))
 
 
-def format_beer_dict(beer_name: str, beer_description: str,
-                     beer_brewery: str, beer_abv: float = None,
-                     beer_ibu: int = None, beer_hops: list = [],
-                     beer_malts: list = [], beer_avail: list = [],
+def format_beer_dict(_id: int, _type: str, 
+                     beer_name: str, 
+                     beer_description: str,
+                     beer_brewery: str, 
+                     beer_abv: float = None,
+                     beer_ibu: int = None, 
+                     beer_hops: list = [],
+                     beer_malts: list = [], 
+                     beer_avail: list = [],
                      beer_style: str = []) -> dict:
     """
     This takes all information collected and formats 
@@ -77,7 +98,9 @@ def format_beer_dict(beer_name: str, beer_description: str,
 
     Proposed Output:
     beers =[
-        {
+        { 
+            "id": 1 # for api
+            "type": "beer"
             "beer": "name of this beer",
             "brewery": "name of this beer"s brewery", (if it"s a bar like Monks)
             "description": "description of this beer",
@@ -205,6 +228,8 @@ def format_beer_dict(beer_name: str, beer_description: str,
     beer_style = search_description(beer_style, STYLES, beer_description)
 
     beer_dict = {
+                    "id": _id,
+                    "type": _type, 
                     "beer": beer_name,
                     "description": beer_description,
                     "brewery": beer_brewery,
