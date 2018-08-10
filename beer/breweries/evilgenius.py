@@ -26,19 +26,44 @@ def parse_url(url):
     
     beers = html.find_all("div", "beer")
 
-    for beer in beers:
+    for _id, beer in enumerate(beers, start = 1):
+        logging.debug(f'id: {_id}')
+
         beer_dict = {}
-        beer_name = beer.find("h2", "beer-title").get_text()
+        beer_name = None
+        beer_description = None
+        beer_notes = None
+        beer_stats = {}
+
+        beer_brewery = BREWERY # everything served here is by Evil Genius
+        beer_abv = None
+        beer_ibu = None
+        beer_hops = []
+        beer_malts = []
+        beer_avail = []
+        beer_style = []
+
+        try:
+            beer_name = beer.find("h2", "beer-title").get_text()
+            logging.info(f"Beer found:  {beer_name}")
+        except:
+            logging.warn("NO BEER FOUND")
+
+
+
         try:
             beer_style = beer.find("h4", "beer-style").get_text()
+            logging.info(f"Style:       {beer_style}")
         except:
-            continue # sometimes non-existant, skipping for now.
-        beer_description = beer.find("div", "col col-1-3").get_text().strip("\n")
+            pass # sometimes non-existant, skipping for now.
 
-        logging.info("Beer found:  {}".format(beer_name))
-        logging.info("Style:       {}".format(beer_style))
-        if beer_description:
+        
+
+        try:
+            beer_description = beer.find("div", "col col-1-3").get_text().strip("\n")
             logging.info("Description: Found")
+        except:
+            logging.warn("no description found")
 
         beer_stats = beer.find("div", "col col-1-3 beer-stats")
         
@@ -58,10 +83,48 @@ def parse_url(url):
         logging.info("Stats:       Found")
         logging.debug(beer_stats_dict)
 
-        beer_dict = {"beer": beer_name, 
-                     "description": beer_description, 
-                     "style": beer_style, 
-                     "stats": beer_stats_dict}
+        try:
+            beer_abv = beer_stats_dict['abv']
+        except:
+            beer_abv = None
+
+        try:
+            beer_hops = beer_stats_dict['hops']
+        except:
+            beer_hops = []
+
+        try:
+            beer_ibu = beer_stats_dict['ibu']
+        except:
+            beer_ibu = None
+
+        try:
+            beer_malts = beer_stats_dict['malts']
+        except:
+            beer_malts = []
+
+        try:
+            beer_avail = beer_stats_dict['available']
+        except:
+            beer_avail = []
+
+        # not used
+        try:
+            beer_package = beer_stats_dict['package']
+        except:
+            beer_package = None
+
+        beer_dict = format_beer_dict(_id              = _id,
+                                     _type            = "beer",
+                                     beer_name        = beer_name,
+                                     beer_description = beer_description,
+                                     beer_brewery     = beer_brewery,
+                                     beer_abv         = beer_abv,
+                                     beer_ibu         = beer_ibu,
+                                     beer_hops        = beer_hops,
+                                     beer_malts       = beer_malts,
+                                     beer_avail       = beer_avail,
+                                     beer_style       = beer_style,)
 
         return_beers.append(beer_dict)
     return(return_beers)
@@ -74,17 +137,20 @@ def evil_genius():
 
     try:
         output = []
-        for location in locations:
+        for _id, location in enumerate(locations, start = 1):
             logging.info("Location: {}".format(location))
             beers = parse_url(BASE_URL)
-            output.append({"location": location, "beers": beers})
+            output.append({"location": location, 
+                           "beers": beers,
+                           "id": _id,
+                           "type": "location"})
         
-        output = {"brewery": BREWERY, "locations": output}
+        output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
 
         print("{} completed".format(BREWERY))
-    except:
-        logging.warning("{} failed.")
+    except Exception as e:
+        logging.warning(f"{type(e)} {e} failed.")
 
 if __name__ == '__main__':
     evil_genius()

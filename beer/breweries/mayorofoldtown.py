@@ -83,7 +83,7 @@ def mayorofoldtown():
             beers = parse_url(BASE_URL)
             output.append({"location": location, "beers": beers})
 
-        output = {"brewery": BREWERY, "locations": output}
+        output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
 
         print("{} completed".format(BREWERY))

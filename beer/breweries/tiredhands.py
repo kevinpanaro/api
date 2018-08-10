@@ -52,7 +52,7 @@ def parse_url(url):
         beer_notes = None
         beer_stats = {}
 
-        beer_brewery = "Tired Hands Brewery" # everything served here is by Tired Hands
+        beer_brewery = BREWERY # everything served here is by Tired Hands
         beer_abv = None
         beer_ibu = None
         beer_hops = []

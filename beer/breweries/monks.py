@@ -53,50 +53,81 @@ def parse_url(url):
 
     beer_name_list = beer_name_list[:len(beer_descriptions_list)]
 
-    for beer, description in zip(beer_name_list, beer_descriptions_list):
+    for _id, (beer_name, beer_description) in enumerate(zip(beer_name_list, beer_descriptions_list), start=1):
+        logging.debug(f"id: {_id}, beer: {beer_name}")
+        beer_dict = {}
+        beer_notes = None
+        beer_stats = {}
+
+        beer_brewery = None # everything served here is by Tired Hands
+        beer_abv = None
+        beer_ibu = None
+        beer_hops = []
+        beer_malts = []
+        beer_avail = []
+        beer_style = []
+
         stats = {}
 
-        description = description.strip()
+        beer_description = beer_description.strip()
+
         try:
-            origin = description.split("-")[0].strip().title()
+            origin = beer_description.split("-")[0].strip().title()
         except AttributeError:
             origin = None
 
         try:
-            abv = abv_regex.search(description).group()
+            beer_abv = abv_regex.search(beer_description).group()
         except AttributeError:
-            abv = None
+            beer_abv = None
 
-        stats = {"abv": abv,
-                 "origin": origin}
 
-        beer_dict = {"beer": beer.strip(),
-                     "description": description,
-                     "stats": stats,
-                     "summary": summary_regex.search(description).group(1).strip()}
+        # stats = {"abv": abv,
+        #          "origin": origin}
+
+        # beer_dict = {"beer": beer.strip(),
+        #              "description": description,
+        #              "stats": stats,
+        #              "summary": summary_regex.search(description).group(1).strip()}
+        
+
+        beer_dict = format_beer_dict(_id              = _id,
+                                     _type            = "beer",
+                                     beer_name        = beer_name,
+                                     beer_description = beer_description,
+                                     beer_brewery     = beer_brewery,
+                                     beer_abv         = beer_abv,
+                                     beer_ibu         = beer_ibu,
+                                     beer_hops        = beer_hops,
+                                     beer_malts       = beer_malts,
+                                     beer_avail       = beer_avail,
+                                     beer_style       = beer_style,)
         return_beers.append(beer_dict)
     return(return_beers)
 
 
 def monks():
 
-    logLevel=logging.WARN
+    logLevel=logging.DEBUG
     FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
     logging.basicConfig(format=FORMAT,level=logLevel)
 
     try:
         output = []
-        for location in locations:
+        for _id, location in enumerate(locations, start = 1):
             logging.info("Location: {}".format(location))
             beers = parse_url(BASE_URL)
-            output.append({"location": location, "beers": beers})
+            output.append({"location": location, 
+                           "beers": beers, 
+                           "id": _id,
+                           "type": "location"})
 
-        output = {"brewery": BREWERY, "locations": output}
+        output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
         
         print("{} completed".format(BREWERY))
-    except:
-        logging.warning("{} failed.")
+    except Exception as e:
+        logging.warning(f"{type(e)}, {e} failed.")
 
 if __name__ == '__main__':
     monks()

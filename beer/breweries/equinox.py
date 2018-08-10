@@ -28,13 +28,27 @@ def parse_url(url):
 
     return_beers = []
 
-    for beer_url in beer_urls:
+    for _id, beer_url in enumerate(beer_urls, start = 1):
         beer_dict = {}
+        beer_name = None
+        beer_description = None
+        beer_notes = None
+        beer_stats = {}
+
+        beer_brewery = BREWERY # everything served here is by Tired Hands
+        beer_abv = None
+        beer_ibu = None
+        beer_hops = []
+        beer_malts = []
+        beer_avail = []
+        beer_style = []
+        beer_dict = {}
+
         beer = beautiful_url(beer_url)
 
         beer_name = beer.find('h1', {'class': 'entry-title'}).get_text()
 
-        logging.debug("Beer Found: {}".format(beer_name))
+        logging.debug(f"Beer Found: {beer_name}")
 
         beer_details = beer.find('div', {'class': 'entry-content content'})
 
@@ -58,12 +72,32 @@ def parse_url(url):
                 continue
             stat = stat.replace(" ", "_")
             beer_stats[stat.lower()] = data.strip()
+
+        try:
+            beer_abv = beer_stats['abv']
+        except:
+            beer_abv = None
+
+
+
+        try:
+            beer_ibu = beer_stats['ibu']
+        except:
+            beer_ibu = None
+
   
         logging.debug(beer_stats) 
-
-        beer_dict = {"beer": beer_name,
-                     "description": beer_description,
-                     "stats": beer_stats}
+        beer_dict = format_beer_dict(_id              = _id,
+                                     _type            = "beer",
+                                     beer_name        = beer_name,
+                                     beer_description = beer_description,
+                                     beer_brewery     = beer_brewery,
+                                     beer_abv         = beer_abv,
+                                     beer_ibu         = beer_ibu,
+                                     beer_hops        = beer_hops,
+                                     beer_malts       = beer_malts,
+                                     beer_avail       = beer_avail,
+                                     beer_style       = beer_style,)
 
         return_beers.append(beer_dict)
     return(return_beers)   
@@ -77,12 +111,15 @@ def equinox():
 
     try:
         output = []
-        for location in locations:
+        for _id, location in enumerate(locations, start = 1):
             logging.info("Location: {}".format(location))
             beers = parse_url(BASE_URL)
-            output.append({"location": location, "beers": beers})
+            output.append({"location": location, 
+                           "beers": beers, 
+                           "id": _id,
+                           "type": "location"})
 
-        output = {"brewery": BREWERY, "locations": output}
+        output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
 
         print("{} completed".format(BREWERY))
