@@ -34,8 +34,23 @@ def parse_url(url):
 
     return_beers = []
 
-    for beer in all_beers_urls:
+    for _id, beer in enumerate(all_beers_urls, start = 1):
         beer_dict = {}
+
+        beer_name = None
+        beer_description = None
+        beer_notes = None
+        beer_stats = {}
+
+        beer_brewery = None 
+        beer_abv = None
+        beer_ibu = None
+        beer_hops = []
+        beer_malts = []
+        beer_avail = []
+        beer_style = None
+
+
         html = beautiful_url(beer)
 
         beer_name = html.find('h1', {'class':'beertitle'}).get_text()
@@ -58,13 +73,17 @@ def parse_url(url):
 
         if beer_description: logging.debug("Description Found")
 
-        beer_stats = {'style': beer_style,
-                      'abv': beer_abv.strip('%') + '%',
-                      'brewery': beer_brewery}
-
-        beer_dict = {"beer": beer_name,
-                     "description": beer_description,
-                     "stats": beer_stats}   
+        beer_dict = format_beer_dict(_id              = _id,
+                                     _type            = "beer",
+                                     beer_name        = beer_name,
+                                     beer_description = beer_description,
+                                     beer_brewery     = beer_brewery,
+                                     beer_abv         = beer_abv,
+                                     beer_ibu         = beer_ibu,
+                                     beer_hops        = beer_hops,
+                                     beer_malts       = beer_malts,
+                                     beer_avail       = beer_avail,
+                                     beer_style       = beer_style,)
 
         return_beers.append(beer_dict)
     return(return_beers)  
@@ -78,10 +97,13 @@ def mayorofoldtown():
 
     try:
         output = []
-        for location in locations:
+        for _id, location in enumerate(locations, start = 1):
             logging.info("Location: {}".format(location))
             beers = parse_url(BASE_URL)
-            output.append({"location": location, "beers": beers})
+            output.append({"location": location, 
+                           "beers": beers,
+                           "id": _id,
+                           "type": "location"})
 
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
