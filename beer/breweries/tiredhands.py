@@ -58,7 +58,7 @@ def parse_url(url):
         beer_hops = []
         beer_malts = []
         beer_avail = []
-        beer_style = []
+        beer_style = None
 
         try:
             beer_name = beer.find('div', 'menu-item-title').get_text().strip().strip(":")
@@ -72,7 +72,7 @@ def parse_url(url):
 
             abv = abv_regex.search(beer_description).group(0)
             style = style_regex.search(beer_description).group(0)
-
+            
             if abv:
                 beer_abv = abv
 
@@ -125,6 +125,7 @@ def tired_hands():
                            "update_time": update_time,
                            "id": _id,
                            "type": "location"})
+            
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
         
