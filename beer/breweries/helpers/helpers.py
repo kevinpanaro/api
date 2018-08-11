@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import logging
 from bs4 import BeautifulSoup as bs
 import requests
 from contextlib import closing
@@ -201,19 +202,23 @@ def format_beer_dict(_id: int, _type: str,
              "beer_style": re.compile("[\D]+"),
              }
 
-    def search_description(search_term: list, search_bank: list,
+    def search_description(search_term, search_bank: list,
                            beer_description: str) -> list:
         """
         This is a function to return a list of items in the beer description.
         """
+        # if it exists return, it
         if search_term:
             return search_term
-        else:
-            for item in search_bank:# ([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%
+
+        else:   # if it doesn't exist, try to find it.
+            search_term = []
+            for item in search_bank: # ([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%
                 regex = re.compile(item + "(?=[\W])|(?<=[\W])" + item)
                 item = regex.search(beer_description.lower())
                 if item:
                     search_term.append(item.group(0))
+
             return search_term
 
     def style_cleaner(beer_style: list) -> str:
@@ -223,10 +228,12 @@ def format_beer_dict(_id: int, _type: str,
         thats ['api', 'double ipa'] when it's really just
         a ['double api']
         """
-        if not beer_style:
-            return(beer_style)
+        if isinstance(beer_style, str):
+            return(beer_style.strip('.'))
+
         dupes = []
         beer_style_copy = beer_style[:]
+
         for style in beer_style:
             for style_copy in beer_style_copy:
                 if style != style_copy:
@@ -236,16 +243,24 @@ def format_beer_dict(_id: int, _type: str,
         for dupe in dupes:
             beer_style.remove(dupe)
 
-        return(beer_style[0])
+        if len(beer_style) == 1:
+            return(beer_style[0])
+        else:
+            return(beer_style)
 
+    def abv_cleaner(beer_abv):
+        try:    
+            beer_abv = float(REGEX["beer_abv"].search(beer_abv).group(0).strip())
+        except:
+            try:
+                beer_abv = float(REGEX["beer_abv"].search(beer_description).group(0).strip())
+            except:
+                pass
+            pass
+        return(beer_abv)
+    
 
-    try:
-        try:
-            beer_abv = float(beer_abv.strip().strip("%"))
-        except AttributeError:
-            beer_abv = float(REGEX["beer_abv"].search(beer_description).group(0).strip())
-    except:
-        beer_abv = None
+    beer_abv = abv_cleaner(beer_abv)
 
     # I have no way to implement this right now
     if beer_ibu:
@@ -259,6 +274,7 @@ def format_beer_dict(_id: int, _type: str,
 
     beer_style_from_name = search_description(beer_style, STYLES, beer_name)
 
+    # the name probably has the best description for the type of beer it is.
     if beer_style_from_name:
         beer_style = beer_style_from_name
     else:
