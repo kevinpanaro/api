@@ -23,15 +23,29 @@ def parse_url(url):
     '''parse doc street beers'''
     abv_regex = re.compile('([\d]+\.[\d]\s*|[\d]+\s*)(?=%)')
     ibu_regex = re.compile('\d+(?=[\s]IBU)|(?<=IBU[\s])\d+')
-    style_regex = re.compile('(?<=[\/][\s])[\w\s]+(?=[\s][\/])')
+    style_regex = re.compile('(?<=-)[\w\s]+(?=-)')
     return_beers = []
 
     html = beautiful_url(url)
 
     beers = html.find_all("div", "menu-item")
 
-    for beer in beers:
+    for _id, beer in enumerate(beers, start = 1):
+        print(beer)
         beer_dict = {}
+
+        beer_name = None
+        beer_description = None
+        beer_notes = None
+        beer_stats = {}
+
+        beer_brewery = BREWERY # everything served here is by Tired Hands
+        beer_abv = None
+        beer_ibu = None
+        beer_hops = []
+        beer_malts = []
+        beer_avail = []
+        beer_style = None
 
         beer_name = beer.find("div", "menu-item-title").get_text().title().strip()
         logging.info("Beer found:    {}".format(beer_name))
@@ -40,31 +54,30 @@ def parse_url(url):
         if beer_description:
             logging.info("Beer descripton:  FOUND")
 
-        abv = abv_regex.search(beer_description).group()
-        logging.info("ABV found:     {}".format(abv))
+        beer_abv = abv_regex.search(beer_description).group()
+        logging.info("ABV found:     {}".format(beer_abv))
 
-        ibu = ibu_regex.search(beer_description).group()
-        logging.info("IBU found:     {}".format(ibu))
+        beer_ibu = ibu_regex.search(beer_description).group()
+        logging.info("IBU found:     {}".format(beer_ibu))
 
         try:
-            beer_style = style_regex.search(beer_description).group()
+            beer_style = style_regex.search(beer_description).group().strip()
             logging.info("Style found:   {}".format(beer_style))
         except AttributeError:
             logging.info("Style not found")
             beer_style = None
 
-        beer_stats = {"ibu": ibu,
-                      "abv": abv}
-
-        beer_summary = beer_description.split('/')[-1].strip()
-        logging.info("Summary:       FOUND")
-
-        beer_dict = {"beer": beer_name,
-                     "description": beer_description,
-                     "style": beer_style,
-                     "stats": beer_stats,
-                     "summary": beer_summary}
-
+        beer_dict = format_beer_dict(_id              = _id,
+                                     _type            = "beer",
+                                     beer_name        = beer_name,
+                                     beer_description = beer_description,
+                                     beer_brewery     = beer_brewery,
+                                     beer_abv         = beer_abv,
+                                     beer_ibu         = beer_ibu,
+                                     beer_hops        = beer_hops,
+                                     beer_malts       = beer_malts,
+                                     beer_avail       = beer_avail,
+                                     beer_style       = beer_style,)
         return_beers.append(beer_dict)
     return(return_beers)
 
@@ -78,17 +91,20 @@ def dock_street():
 
     try:
         output = []
-        for location in locations:
+        for _id, location in enumerate(locations, start = 1):
             logging.info("Location: {}".format(location))
             beers = parse_url(BASE_URL)
-            output.append({"location": location, "beers": beers})
+            output.append({"location": location, 
+                           "beers": beers, 
+                           "id": _id,
+                           "type": "location"})
 
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
 
         print("{} completed".format(BREWERY))
-    except:
-        logging.warning("{} failed.")
+    except Exception as e:
+        logging.warning(f"{type(e)} {e} failed.")
 
 if __name__ == '__main__':
     dock_street()
