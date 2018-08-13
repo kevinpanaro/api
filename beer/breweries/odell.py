@@ -2,6 +2,8 @@
 Author:  Kevin Panaro
 Date:    3.21.18
 Purpose: Grabs Odell Beers on tap
+
+TODO: Fix this cookie bullshit
 '''
 import logging
 
@@ -10,16 +12,18 @@ try:
 except:
     from .helpers import *
 
-BASE_URL = "https://www.odellbrewing.com/tap-room/"
+BASE_URL = "https://www.odellbrewing.com/taproom{}/"
 BREWERY = "Odell Brewing" 
 SAVE_FILE = "odell.json"
-COOKIE = ('odAccess', 'true', 'www.odellbrewing.com', '/')
-
-locations = ["800 East Lincoln Ave, Fort Collins, CO 80524"]
+COOKIE = {'name': 'odAccess', 'value': 'true', 'domain': 'www.odellbrewing.com', 'path': '/'}
+ 
+locations = {"Fort Collins": "", "Denver": "-denver"}
 
 def get_beers_url(url):
     html = beautiful_url(url, COOKIE)
-    all_beers = html.find_all('p', {'class':'tap-beer'})
+    # logging.info(html)
+    all_beers = html.find_all('div', {"class": "item-bg-color menu-item"})
+    
     beer_urls = []
     for url in html.find_all('p', {'class':'tap-beer'}):
         beer_urls.append(url.find('a')['href'])
@@ -29,7 +33,6 @@ def get_beers_url(url):
 def parse_url(url):
 
     beer_urls = get_beers_url(url)
-
     return_beers = []
 
     for beer_url in beer_urls:
@@ -73,18 +76,18 @@ def odell():
 
     try:
         output = []
-        cookie = ('odAccess', 'true', 'www.odellbrewing.com', '/')
-        for location in locations:
+        # cookie = ('odAccess', 'true', 'www.odellbrewing.com', '/')
+        for location, url in locations.items():
             logging.info("Location: {}".format(location))
-            beers = parse_url(BASE_URL)
+            beers = parse_url(BASE_URL.format(url))
             output.append({"location": location, "beers": beers})
 
-        output = {"brewery": BREWERY, "locations": output}
+        output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
         
         print("{} completed".format(BREWERY))
-    except:
-        logging.warning("{} failed.")
+    except Exception as e:
+        logging.warning(f"{e} failed.")
 
 if __name__ == '__main__':
     odell()
