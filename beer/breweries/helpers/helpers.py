@@ -2,11 +2,68 @@ import os
 import json
 import re
 import logging
+import time
+import pdb
 from bs4 import BeautifulSoup as bs
 import requests
 from contextlib import closing
 
 logging = logging.getLogger(__name__)
+
+def get_id(file_name):
+    """
+    Opens and returns the next id number
+    for the next beer. 
+
+    Input: None
+
+    Output: id int
+    """
+    logging.debug("beginning get_beer_id")
+    path = os.path.dirname(os.path.realpath(__file__))
+
+    full_id_path = os.path.join(path, 'tmp', file_name)
+
+    if not os.path.exists(full_id_path):
+        set_beer_id(file_name)
+
+    with open(full_id_path, 'r') as f:
+        last_id = f.read()
+    last_id = int(last_id)
+    logging.debug(f"{file_name} found: {last_id}")
+    return(last_id)
+
+def reset_id():
+    """
+    Resets the id using set_id()
+    """
+    logging.info(f"Resetting all files")
+    path = os.path.dirname(os.path.realpath(__file__))
+    for _, _, all_files in os.walk(os.path.join(path, 'tmp')):
+        pass
+    for file in all_files:
+        logging.debug(f"Resetting {file}")
+        set_id(file_name = file)
+
+def set_id(file_name = None, starting_id = 1):
+    """
+    Sets the id to the arg value.
+
+    Input: int
+
+    Output: file in tmp/id used for id over entire beer
+    """
+    logging.debug("starting set_beer_id")
+    path = os.path.dirname(os.path.realpath(__file__))
+
+    full_id_path = os.path.join(path, 'tmp', file_name)
+    logging.debug(f"{full_id_path}")
+
+    with open(full_id_path, 'w+') as f:
+        f.write(str(starting_id))
+        logging.debug(f"wrote {starting_id} to {file_name}")
+
+
 
 def b_id():
     """ 
