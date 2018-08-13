@@ -34,6 +34,7 @@ def parse_url(url):
 
     return_beers = []
 
+    _id = get_id("beer_id")
     for _id, beer in enumerate(all_beers_urls, start = 1):
         beer_dict = {}
 
@@ -86,6 +87,11 @@ def parse_url(url):
                                      beer_style       = beer_style,)
 
         return_beers.append(beer_dict)
+                
+        _id += 1
+
+    set_id(file_name = "beer_id", starting_id = _id)
+
     return(return_beers)  
 
 def mayorofoldtown():

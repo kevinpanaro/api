@@ -1,7 +1,7 @@
 import logging
 import re
 from datetime import date
-
+import pdb
 try:
     from helpers import *
 except:
@@ -43,7 +43,10 @@ def parse_url(url):
 
     beers = data.find_all('div', 'menu-item')
 
-    for _id, beer in enumerate(beers, start = 1):
+    _id = get_id("beer_id")
+
+    logging.info(f"current beer id: {_id} - {type(_id)}")
+    for beer in beers:
         abv_regex = re.compile('([\d]+\.[\d]\s*|[\d]+\s*)(?=%)%')
         style_regex = re.compile('[\D]+')
 
@@ -105,6 +108,9 @@ def parse_url(url):
 
         except AttributeError:
             logging.info("bad beer")
+        _id += 1
+
+    set_id(file_name = "beer_id", starting_id = _id)
 
     return(return_beers, update_time)
 

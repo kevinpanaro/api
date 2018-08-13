@@ -28,7 +28,8 @@ def parse_url(url):
 
     return_beers = []
 
-    for _id, beer_url in enumerate(beer_urls, start = 1):
+    _id = get_id("beer_id")
+    for beer_url in beer_urls:
         beer_dict = {}
         beer_name = None
         beer_description = None
@@ -100,6 +101,11 @@ def parse_url(url):
                                      beer_style       = beer_style,)
 
         return_beers.append(beer_dict)
+        
+        _id += 1
+
+    set_id(file_name = "beer_id", starting_id = _id)
+
     return(return_beers)   
 
 

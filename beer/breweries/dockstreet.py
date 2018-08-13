@@ -30,8 +30,10 @@ def parse_url(url):
 
     beers = html.find_all("div", "menu-item")
 
-    for _id, beer in enumerate(beers, start = 1):
-        print(beer)
+    _id = get_id("beer_id")
+
+    for beer in beers:
+
         beer_dict = {}
 
         beer_name = None
@@ -79,6 +81,9 @@ def parse_url(url):
                                      beer_avail       = beer_avail,
                                      beer_style       = beer_style,)
         return_beers.append(beer_dict)
+        _id += 1
+
+    set_id(file_name = "beer_id", starting_id = _id)
     return(return_beers)
 
 

@@ -53,7 +53,9 @@ def parse_url(url):
 
     beer_name_list = beer_name_list[:len(beer_descriptions_list)]
 
-    for _id, (beer_name, beer_description) in enumerate(zip(beer_name_list, beer_descriptions_list), start=1):
+    _id = get_id("beer_id")
+
+    for beer_name, beer_description in zip(beer_name_list, beer_descriptions_list):
         logging.debug(f"id: {_id}, beer: {beer_name}")
         beer_dict = {}
         beer_notes = None
@@ -103,6 +105,8 @@ def parse_url(url):
                                      beer_avail       = beer_avail,
                                      beer_style       = beer_style,)
         return_beers.append(beer_dict)
+        _id += 1
+    set_id(file_name = "beer_id", starting_id = _id)
     return(return_beers)
 
 
@@ -125,7 +129,7 @@ def monks():
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
         
-        print("{} completed".format(BREWERY))
+        logging.info(f"Complete: {BREWERY}")
     except Exception as e:
         logging.warning(f"{type(e)}, {e} failed.")
 

@@ -26,7 +26,9 @@ def parse_url(url):
     
     beers = html.find_all("div", "beer")
 
-    for _id, beer in enumerate(beers, start = 1):
+    _id = get_id("beer_id")
+
+    for beer in beers:
         logging.debug(f'id: {_id}')
 
         beer_dict = {}
@@ -127,6 +129,11 @@ def parse_url(url):
                                      beer_style       = beer_style,)
 
         return_beers.append(beer_dict)
+                
+        _id += 1
+
+    set_id(file_name = "beer_id", starting_id = _id)
+
     return(return_beers)
 
 def evil_genius():
