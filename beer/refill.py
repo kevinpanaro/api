@@ -1,20 +1,24 @@
 '''
 Used basically as a main
 '''
-
+import logging
 from breweries import *
-# from breweries.threefourbeerco import threefourbeerco
-# from breweries.tiredhands_class import TiredHands
-
+from breweries.helpers import *
 
 def pour_beer():
     '''pour beer into the taps, heh...'''
+    logLevel=logging.INFO
+    FORMAT = '[%(asctime)s] [%(levelname)-8s] %(filename)-15s %(funcName)-18s - %(lineno)-3d - %(message)s'
+    logging.basicConfig(format=FORMAT,level=logLevel)
+
+    reset_id()
+    
     dock_street()
     equinox()
     evil_genius()
     mayorofoldtown()
     monks()
-    odell()
+    # odell()
     tired_hands()
     # TiredHands().update()
 
