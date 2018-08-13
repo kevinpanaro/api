@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup as bs
 import requests
 from contextlib import closing
 
+logging = logging.getLogger(__name__)
+
 def b_id():
     """ 
     Theres a better way to do this, but
@@ -30,12 +32,17 @@ def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
 
     def is_good_response(resp):
         content_type = resp.headers["Content-Type"].lower()
+        if resp.status_code != 200:
+            logging.warn(f"Status Code: {resp.status_code}")
+        else:
+            logging.info(f"Status Code: {resp.status_code}")
         return (resp.status_code == 200
                 and content_type is not None
                 and content_type.find("html") > -1)
         
     try:
         if cookie:
+            logging.critical("Cookies don't work right now.")
             # name, content, domain, path = cookie
             # jar = cookies.RequestsCookieJar()
             # jar.set(name=name, value=content, domain=domain, path=path)
@@ -58,12 +65,13 @@ def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
         with closing(requests.get(url)) as resp:
             if is_good_response(resp):
                 souped_url = bs(resp.text, "html.parser")
+                logging.info("Successfull parse of url")
                 return souped_url
             else:
                 return None
 
-    except Exception as e:
-        print(e)
+    except Exception as err:
+        logging.warn(f"{type(err)}: {err}")
 
 
 def save_beer(data: dict, file_name: str) -> None:
@@ -81,6 +89,8 @@ def save_beer(data: dict, file_name: str) -> None:
 
     with open(save_path, "w+") as f:
         f.write(json.dumps(data))
+
+    logging.info(f"Saved: {file_name}")
 
 
 def format_beer_dict(_id: int, _type: str, 
@@ -248,7 +258,7 @@ def format_beer_dict(_id: int, _type: str,
         else:
             return(beer_style)
 
-    def abv_cleaner(beer_abv):
+    def abv_cleaner(beer_abv) -> float:
         try:    
             beer_abv = float(REGEX["beer_abv"].search(beer_abv).group(0).strip())
         except:
