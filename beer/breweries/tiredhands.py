@@ -27,18 +27,19 @@ def parse_url(url):
     try:
         update_time = data.find('div', 'sqs-block html-block sqs-block-html')
 
-    except AttributeError:
+    except AttributeError: # this has a potentional to loop forever... TODO
         logging.info("AttributeError, but trying again")
         parse_url(url)
 
     try:
         update_time = update_time
     except UnboundLocalError:
+        update_time = None
         logging.warning("UnboundLocalError, but skipping")
 
     update_time = update_time_regex.search(update_time.text).group(0)
 
-    logging.info("Update date: {}".format(update_time))
+    logging.debug("Update date: {}".format(update_time))
 
     beers = data.find_all('div', 'menu-item')
 
@@ -65,10 +66,10 @@ def parse_url(url):
             if beer_name in kill:
                 logging.info("All beer found")
                 break
-            logging.info("Beer found: {}".format(beer_name))
+            logging.debug("Beer found: {}".format(beer_name))
 
             beer_description = beer.find('div', 'menu-item-description').get_text().strip()
-            logging.info("Description found")
+            logging.debug("Description found")
 
             abv = abv_regex.search(beer_description).group(0)
             style = style_regex.search(beer_description).group(0)
@@ -81,7 +82,7 @@ def parse_url(url):
 
             try:
                 beer_notes = beer.find('div', 'menu-item-price-bottom').get_text().strip()[1::]
-                logging.info("Notes found")
+                logging.debug("Notes found")
             except:
                 beer_notes = ""
                 logging.info("Notes not found")
@@ -110,12 +111,13 @@ def parse_url(url):
 
 def tired_hands():
 
-    logLevel=logging.DEBUG
-    FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
+    logLevel=logging.INFO
+    FORMAT = '[%(asctime)s] [%(levelname)-8s] %(filename)-15s %(funcName)-18s - %(lineno)-3d - %(message)s'
     logging.basicConfig(format=FORMAT,level=logLevel)
 
     try:
         output = []
+        logging.info(f"Establishment: {BREWERY}")
         for _id, location in enumerate(locations, start = 1):
             logging.info("Location: {}".format(location))
             location_url = BASE_URL.format(location)
@@ -129,9 +131,9 @@ def tired_hands():
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
         
-        print("{} completed".format(BREWERY))
+        logging.info(f"Complete: {BREWERY}")
     except Exception as e:
-        logging.warning(f"{e} failed.")
+        logging.warning(f"{type(e)} {e} failed.")
 
 
 if __name__ == '__main__':
