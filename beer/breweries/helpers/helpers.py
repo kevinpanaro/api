@@ -92,7 +92,7 @@ def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
         if resp.status_code != 200:
             logging.warn(f"Status Code: {resp.status_code}")
         else:
-            logging.info(f"Status Code: {resp.status_code}")
+            logging.debug(f"Status Code: {resp.status_code}")
         return (resp.status_code == 200
                 and content_type is not None
                 and content_type.find("html") > -1)
@@ -122,7 +122,7 @@ def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
         with closing(requests.get(url)) as resp:
             if is_good_response(resp):
                 souped_url = bs(resp.text, "html.parser")
-                logging.info("Successfull parse of url")
+                logging.debug("Successfull parse of url")
                 return souped_url
             else:
                 return None
