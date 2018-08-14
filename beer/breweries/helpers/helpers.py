@@ -1,11 +1,12 @@
 import os
 import json
 import re
+import requests
 import logging
 import time
 import pdb
 from bs4 import BeautifulSoup as bs
-import requests
+from requests_html import HTMLSession 
 from contextlib import closing
 
 logging = logging.getLogger(__name__)
@@ -81,7 +82,8 @@ def b_id():
     return(brewery_id)
 
 
-def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
+def beautiful_url(url: str, cookies: list = False, 
+                  javascript: bool = False) -> "BeautifulSoup Object":
     """
     simple url grab but also closes 
     nicely and beautiful soups it
@@ -96,39 +98,39 @@ def beautiful_url(url: str, cookie: bool = False) -> "BeautifulSoup Object":
         return (resp.status_code == 200
                 and content_type is not None
                 and content_type.find("html") > -1)
+
+
+    cookiejar = requests.cookies.RequestsCookieJar()
+
+    if cookies:
+        logging.info("Prepping cookies...")
+        for cookie in cookies:
+            cookiejar.set(name=cookie['name'],
+                          value=cookie['value'],
+                          domain=cookie['domain'],
+                          path=cookie['path'],
+                          )
+
+    if javascript:
+        session = HTMLSession()
+        resp = session.get(url, cookies=cookiejar)
+
+        resp.html.render()
+        if is_good_response(resp):
+            souped_url = bs(resp.html.html, "html.parser")
+            logging.debug("Successfull parse of url")
+            return souped_url
+        else:
+            return None
         
-    try:
-        if cookie:
-            logging.critical("Cookies don't work right now.")
-            # name, content, domain, path = cookie
-            # jar = cookies.RequestsCookieJar()
-            # jar.set(name=name, value=content, domain=domain, path=path)
-            cookiejar = requests.cookies.RequestsCookieJar()
-            cookiejar.set(name="odAccess", value="true", domain="www.odellbrewing.com", path="/")
-            req = requests.Request(method="GET", url=url, cookies=cookiejar)
+    with closing(requests.get(url, cookies=cookiejar)) as resp:
+        if is_good_response(resp):
+            souped_url = bs(resp.text, "html.parser")
+            logging.debug("Successfull parse of url")
+            return souped_url
+        else:
+            return None
 
-            prepared_req = req.prepare()
-            
-            s = requests.Session()
-            resp = s.send(prepared_req)
-            # print(resp)
-            if is_good_response(resp):
-                souped_url = bs(resp.text, "html.parser")
-
-                return souped_url
-            else:
-                return None
-
-        with closing(requests.get(url)) as resp:
-            if is_good_response(resp):
-                souped_url = bs(resp.text, "html.parser")
-                logging.debug("Successfull parse of url")
-                return souped_url
-            else:
-                return None
-
-    except Exception as err:
-        logging.warn(f"{type(err)}: {err}")
 
 
 def save_beer(data: dict, file_name: str) -> None:
@@ -267,6 +269,8 @@ def format_beer_dict(_id: int, _type: str,
     
     REGEX = {"beer_abv": re.compile("([\d]+\.[\d]\s*|[\d]+\s*)(?=%)"),
              "beer_style": re.compile("[\D]+"),
+             "beer_style": re.compile("[\w]+[\w\s]?[\w]+"),
+             "beer_ibu": re.compile("[\d]+"),
              }
 
     def search_description(search_term, search_bank: list,
@@ -296,7 +300,10 @@ def format_beer_dict(_id: int, _type: str,
         a ['double api']
         """
         if isinstance(beer_style, str):
-            return(beer_style.strip('.'))
+            try:
+                return(REGEX["beer_style"].search(beer_style).group(0).strip())
+            except:
+                return(None)
 
         dupes = []
         beer_style_copy = beer_style[:]
@@ -326,12 +333,18 @@ def format_beer_dict(_id: int, _type: str,
             pass
         return(beer_abv)
     
+    def ibu_cleaner(beer_ibu) -> int:
+        try:
+            beer_ibu = int(REGEX["beer_ibu"].search(beer_ibu).group(0).strip())
+        except:
+            pass
+        return(beer_ibu)
 
     beer_abv = abv_cleaner(beer_abv)
 
     # I have no way to implement this right now
     if beer_ibu:
-        pass
+        beer_ibu = ibu_cleaner(beer_ibu)
 
     beer_hops = search_description(beer_hops, HOPS, beer_description)
 
