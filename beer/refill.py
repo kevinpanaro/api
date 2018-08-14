@@ -18,7 +18,7 @@ def pour_beer():
     evil_genius()
     mayorofoldtown()
     monks()
-    # odell()
+    odell()
     tired_hands()
     # TiredHands().update()
 
