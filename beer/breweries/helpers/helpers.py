@@ -13,12 +13,10 @@ logging = logging.getLogger(__name__)
 
 def get_id(file_name):
     """
-    Opens and returns the next id number
-    for the next beer. 
-
-    Input: None
-
-    Output: id int
+    Opens and returns the next id number for the next beer.
+     
+    :param file_name: the file name for an id file
+    :return: the number in the id file
     """
     logging.debug("beginning get_beer_id")
     path = os.path.dirname(os.path.realpath(__file__))
@@ -26,17 +24,18 @@ def get_id(file_name):
     full_id_path = os.path.join(path, 'tmp', file_name)
 
     if not os.path.exists(full_id_path):
-        set_beer_id(file_name)
+        set_id(file_name)
 
     with open(full_id_path, 'r') as f:
         last_id = f.read()
+
     last_id = int(last_id)
     logging.debug(f"{file_name} found: {last_id}")
     return(last_id)
 
 def reset_id():
     """
-    Resets the id using set_id()
+    Resets the id of all id files in /tmp/ to one, using set_id()
     """
     logging.info(f"Resetting all files")
     path = os.path.dirname(os.path.realpath(__file__))
@@ -46,15 +45,15 @@ def reset_id():
         logging.debug(f"Resetting {file}")
         set_id(file_name = file)
 
-def set_id(file_name = None, starting_id = 1):
+
+def set_id(file_name: str, starting_id = 1):
     """
     Sets the id to the arg value.
 
-    Input: int
-
-    Output: file in tmp/id used for id over entire beer
+    :param file_name: the file name for an id file
+    :param starting_id: the number to set the id file to (optional)
     """
-    logging.debug("starting set_beer_id")
+    logging.debug("starting set_id")
     path = os.path.dirname(os.path.realpath(__file__))
 
     full_id_path = os.path.join(path, 'tmp', file_name)
@@ -68,8 +67,9 @@ def set_id(file_name = None, starting_id = 1):
 
 def b_id():
     """ 
-    Theres a better way to do this, but
-    for now it's hard coded, shoot me.
+    Theres a better way to do this, but for now it's hard coded, shoot me.
+
+    :return: List of breweries, with cooresponding id values. Manually updated.
     """
     brewery_id = {"Tired Hands Brewery": 1,
                 "Equinox Brewing": 2,
@@ -87,6 +87,11 @@ def beautiful_url(url: str, cookies: list = False,
     """
     simple url grab but also closes 
     nicely and beautiful soups it
+
+    :param url: the string url to scrape
+    :param cookies: a list of cookies (optional)
+    :param javascript: a bool to indicate if javascript is present on the url page. (optional)
+    :return: a BeautifulSoup Object
     """
 
     def is_good_response(resp):
@@ -189,6 +194,19 @@ def format_beer_dict(_id: int, _type: str,
             }
         }, # and so on for other beers
     ]
+
+    :param _id: the beer id value 
+    :param _type: the beer type value
+    :param beer_name: the name of the beer
+    :param beer_description: the description of the beer
+    :param beer_brewery: the brewery of the beer
+    :param beer_abv: the abv of the beer (optional)
+    :param beer_ibu: the ibu of the beer (optional)
+    :param beer_hops: the hops of the beer (optional)
+    :param beer_malts: malts of the beer (optional)
+    :param beer_avail: the availability of the beer (optional)
+    :param beer_style: the style of the beer (optional)
+    :return: a correctly formatted dict
     """
 
     ###############################################
@@ -277,6 +295,16 @@ def format_beer_dict(_id: int, _type: str,
                            beer_description: str) -> list:
         """
         This is a function to return a list of items in the beer description.
+
+        Args:
+                 search_term: the variable we're searching for
+                 search_bank: the bank of variables we are 
+                              iteration through
+            beer_description: the description provided
+                              by the beer
+
+        Returns:
+            A list of terms found in the beer_description
         """
         # if it exists return, it
         if search_term:
@@ -298,6 +326,12 @@ def format_beer_dict(_id: int, _type: str,
         this will help with cleaning up a beer 
         thats ['api', 'double ipa'] when it's really just
         a ['double api']
+
+        Args:
+            beer_style: a list of styles
+
+        Returns:
+            non duplicate styles (list or str)
         """
         if isinstance(beer_style, str):
             try:
