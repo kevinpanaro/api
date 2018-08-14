@@ -107,7 +107,7 @@ def dock_street():
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
 
-        print("{} completed".format(BREWERY))
+        logging.info(f"Complete: {BREWERY}")
     except Exception as e:
         logging.warning(f"{type(e)} {e} failed.")
 
