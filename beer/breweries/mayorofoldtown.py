@@ -35,7 +35,7 @@ def parse_url(url):
     return_beers = []
 
     _id = get_id("beer_id")
-    for _id, beer in enumerate(all_beers_urls, start = 1):
+    for beer in all_beers_urls:
         beer_dict = {}
 
         beer_name = None

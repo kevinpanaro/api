@@ -15,5 +15,5 @@ __all__ = [
            "b_id",
            "get_id",
            "set_id",
-           "reset_id"
+           "reset_id",
            ]
