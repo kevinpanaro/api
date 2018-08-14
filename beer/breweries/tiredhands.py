@@ -12,7 +12,7 @@ BASE_URL = "http://www.tiredhands.com/{}/beers/"
 BREWERY = "Tired Hands Brewery"
 SAVE_FILE = "tired_hands.json"
 
-locations = ['fermentaria', 'cafe']
+locations = {"Fermentaria": 'fermentaria',"Brew Cafe": "cafe"}
 
 
 def parse_url(url):
@@ -112,7 +112,7 @@ def parse_url(url):
 
     set_id(file_name = "beer_id", starting_id = _id)
 
-    return(return_beers, update_time)
+    return(return_beers)
 
 
 def tired_hands():
@@ -124,20 +124,27 @@ def tired_hands():
     try:
         output = []
         logging.info(f"Establishment: {BREWERY}")
-        for _id, location in enumerate(locations, start = 1):
+
+        _id = get_id("location_id")
+
+        for location, url in locations.items():
             logging.info("Location: {}".format(location))
-            location_url = BASE_URL.format(location)
-            beers, update_time = parse_url(location_url)
+            location_url = BASE_URL.format(url)
+            beers = parse_url(location_url)
             output.append({"location": location, 
                            "beers": beers, 
-                           "update_time": update_time,
                            "id": _id,
                            "type": "location"})
-            
+            _id += 1
+
+        set_id(file_name = "location_id", starting_id = _id)  
+
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
+
         save_beer(output, SAVE_FILE)
         
         logging.info(f"Complete: {BREWERY}")
+
     except Exception as e:
         logging.warning(f"{type(e)} {e} failed.")
 

@@ -24,15 +24,6 @@ COOKIES = [{'name': 'odAccess', 'value': 'true', 'domain': 'www.odellbrewing.com
  
 locations = {"Fort Collins": "", "Denver": "-denver"}
 
-# def get_beers_url(url):
-#     html = beautiful_url(url=url, cookies=COOKIES, javascript=True)
-#     all_beers = html.find_all('div', {"class": "item-bg-color menu-item"})
-    
-#     beer_urls = []
-#     for url in html.find_all('p', {'class':'tap-beer'}):
-#         beer_urls.append(url.find('a')['href'])
-#     logging.debug("{} beer urls found".format(len(beer_urls)))
-#     return(beer_urls)
 
 def parse_url(url):
     beers = beautiful_url(url=url, cookies=COOKIES, javascript=True)
@@ -43,7 +34,6 @@ def parse_url(url):
     _id = get_id("beer_id")
 
     for beer in beers:
-        print(beer)
         beer_dict = {}
         beer_name = None
         beer_description = None
@@ -101,16 +91,25 @@ def parse_url(url):
 def odell():
 
     logLevel=logging.INFO
-    FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
+    FORMAT = '[%(asctime)s] [%(levelname)-8s] %(filename)-15s %(funcName)-18s - %(lineno)-3d - %(message)s'
     logging.basicConfig(format=FORMAT,level=logLevel)
 
     try:
         output = []
 
+        _id = get_id("location_id")
+
         for location, url in locations.items():
             logging.info("Location: {}".format(location))
-            beers = parse_url(BASE_URL.format(url))
-            output.append({"location": location, "beers": beers})
+            location_url = BASE_URL.format(url)
+            beers = parse_url(location_url)
+            output.append({"location": location, 
+                           "beers": beers, 
+                           "id": _id,
+                           "type": "location"})
+            _id += 1
+
+        set_id(file_name = "location_id", starting_id = _id) 
 
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)

@@ -22,7 +22,7 @@ BASE_URL = "http://www.monkscafe.com/on-tap/"
 BREWERY = "Monk's Cafe" # not a brewery just a BASE_URL
 SAVE_FILE = "monks.json"
 
-locations = ["264 S. 16th Street, Philadelphia, PA 19102"]
+locations = {"264 S. 16th Street, Philadelphia, PA 19102": None}
 
 
 def parse_url(url):
@@ -113,18 +113,25 @@ def parse_url(url):
 def monks():
 
     logLevel=logging.DEBUG
-    FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s'
+    FORMAT = '[%(asctime)s] [%(levelname)-8s] %(filename)-15s %(funcName)-18s - %(lineno)-3d - %(message)s'
     logging.basicConfig(format=FORMAT,level=logLevel)
 
     try:
         output = []
-        for _id, location in enumerate(locations, start = 1):
+        
+        _id = get_id("location_id")
+
+        for location, url in locations.items():
             logging.info("Location: {}".format(location))
-            beers = parse_url(BASE_URL)
+            location_url = BASE_URL.format(url)
+            beers = parse_url(location_url)
             output.append({"location": location, 
                            "beers": beers, 
                            "id": _id,
                            "type": "location"})
+            _id += 1
+
+        set_id(file_name = "location_id", starting_id = _id) 
 
         output = {"locations": output, "establishment": BREWERY, "id": b_id()[BREWERY], "type": "establishment"}
         save_beer(output, SAVE_FILE)
