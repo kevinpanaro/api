@@ -11,6 +11,20 @@ from contextlib import closing
 
 logging = logging.getLogger(__name__)
 
+
+def valid_url(url):
+    """
+    dirty helper to decide if the url is a url
+
+    :param url: a string, hopefully a url
+    :return: a bool of whether or not its a url
+    """
+    try:
+        requests.get(url).status_code
+        return(True)
+    except:
+        return(False)
+
 def get_id(file_name):
     """
     Opens and returns the next id number for the next beer.

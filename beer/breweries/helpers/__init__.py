@@ -6,6 +6,7 @@ from .helpers import (
     get_id,
     set_id,
     reset_id,
+    valid_url
     )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
            "get_id",
            "set_id",
            "reset_id",
+           "valid_url",
            ]
