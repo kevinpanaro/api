@@ -41,7 +41,7 @@ def parse_url(url):
         beer_abv = None
         beer_ibu = None
         beer_hops = []
-        beer_malts = []
+        beer_malts = [] 
         beer_avail = []
         beer_style = []
 
