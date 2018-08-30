@@ -18,7 +18,7 @@ except:
     from .helpers import *
 
 BASE_URL = "https://www.odellbrewing.com/taproom{}/"
-BREWERY = "Odell Brewing" 
+BREWERY = "Odell Brewing"
 SAVE_FILE = "odell.json"
 COOKIES = [{'name': 'odAccess', 'value': 'true', 'domain': 'www.odellbrewing.com', 'path': '/'}]
  
