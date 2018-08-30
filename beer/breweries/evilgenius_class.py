@@ -1,19 +1,19 @@
 from helpers.breweries import Brewery
 
-base_url = "http://www.tiredhands.com/{}/beers/"
-brewery_name = "Tired Hands Brewery"
+base_url = "http://evilgeniusbeer.com/beers/{}"
+brewery_name = "Evil Genius Brewery"
 cookies = None
 javascript = False
-save_file = "tired_hands_class.json"
-locations = {"Fermentaria": 'fermentaria',"Brew Cafe": "cafe"}
+save_file = "evil_genius_class.json"
+locations = {'Fishtown': ""}
 single_page = True
-beers_html_tags = ('div', 'menu-item')
-beer_name_tags = ('div', 'menu-item-title')
-beer_description_tags = ('div', 'menu-item-description')
-kill = ["***Other Beverages***", "***Sunday Brunch Beverages***"]
+beers_html_tags = ("div", "beer")
+beer_name_tags = ("h2", "beer-title")
+beer_description_tags = ("div", "col col-1-3")
+beer_style_tags = ("h4", "beer-style")
 
 
-TiredHands = Brewery(brewery_name=brewery_name,
+EvilGenius = Brewery(brewery_name=brewery_name,
                      base_url=base_url,
                      cookies=cookies,
                      javascript=javascript,
@@ -23,6 +23,7 @@ TiredHands = Brewery(brewery_name=brewery_name,
                      beers_html_tags=beers_html_tags,
                      beer_name_tags=beer_name_tags,
                      beer_description_tags=beer_description_tags,
-                     kill=kill)
+                     beer_style_tags=beer_style_tags,
+                     )
 
-TiredHands.run()
+EvilGenius.run()
