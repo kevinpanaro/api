@@ -60,7 +60,7 @@ def reset_id():
         set_id(file_name = file)
 
 
-def set_id(file_name: str, starting_id = 1):
+def set_id(file_name: str, starting_id=1):
     """
     Sets the id to the arg value.
 
@@ -166,7 +166,7 @@ def save_beer(data: dict, file_name: str) -> None:
 
 
     with open(save_path, "w+") as f:
-        f.write(json.dumps(data))
+        json.dump(data, f, indent=2, sort_keys=True)
 
     logging.info(f"Saved: {file_name}")
 

@@ -1,12 +1,30 @@
 import helpers
 
+
+
+
+
 class Brewery():
 
-    def __init__(self, brewery_name: str, base_url: str, cookies: list, javascript: bool, save_file: str,
-                 locations: dict, single_page: bool, beers_html_tags,
-                 beer_name_tags, beer_description_tags, beer_brewery_tags = None,beer_abv_tags = None,
-                 beer_ibu_tags = None, beer_hops_tags = [], beer_malts_tags = [],
-                 beer_avail_tags = [], beer_style_tags = None, beer_multi_page_tags = None, kill = []):
+    def __init__(self, brewery_name: str,
+                 base_url: str,
+                 cookies: list,
+                 javascript: bool,
+                 save_file: str,
+                 locations: dict,
+                 single_page: bool,
+                 beer_name_tags,
+                 beer_description_tags,
+                 beers_html_tags=None,
+                 beer_brewery_tags=None,
+                 beer_abv_tags=None,
+                 beer_ibu_tags=None,
+                 beer_hops_tags=[],
+                 beer_malts_tags=[],
+                 beer_avail_tags=[],
+                 beer_style_tags=None,
+                 beer_multi_page_tags=None,
+                 kill=[]):
 
         self.brewery_name = brewery_name            # name of the brewery
         self.base_url = base_url                    # base url for the brewery
@@ -38,27 +56,38 @@ class Brewery():
         self.beer_avail = []
         self.beer_style = None
 
+        self.current_id_name = None
 
-    def __call__(self):
-        self.main()
+    def run(self):
+        self.main(_id=None)
 
-    def main(self):
+    def decorator_args(id_name):
+        def id_decorator(function):
+            # gets the id filename and performs a nice decoration
+            def wrapper(self, **kwargs):
+                _id = helpers.get_id(id_name)
+                kwargs["_id"] = _id
+                _id = function(self, **kwargs)
+                helpers.set_id(file_name=id_name, starting_id=_id)
+            return(wrapper)
+        return(id_decorator)
+
+
+    @decorator_args(id_name="location_id")
+    def main(self, **kwargs):
+        _id = kwargs.pop("_id", None)
         output = []
-
-        _id = helpers.get_id("location_id")
 
         for location, url in self.locations.items():
             self.return_beers = []
-
+            
             location_url = self.base_url.format(url)
-            self.get_beers(location_url)
+            self.get_beers(location_url=location_url, _id=None)
             output.append({"location": location, 
                            "beers": self.return_beers, 
                            "id": _id,
                            "type": "location"})
             _id += 1
-
-        helpers.set_id(file_name = "location_id", starting_id = _id)
 
         output = {"locations": output, 
                   "establishment": self.brewery_name, 
@@ -66,11 +95,15 @@ class Brewery():
                   "type": "establishment"}
 
         helpers.save_beer(output, self.save_file)
+        return(_id)
 
-    def get_beers(self, location_url):
+    @decorator_args(id_name="beer_id")
+    def get_beers(self, **kwargs):
+        _id = kwargs.pop("_id")
+        location_url = kwargs.pop("location_url")
+
         self.get_beers_list(location_url)
 
-        _id = helpers.get_id("beer_id")
         for beer in self.beers:
             """
             At this point it is required that beer
@@ -85,32 +118,26 @@ class Brewery():
                                      cookies=self.cookies, 
                                      javascript=self.javascript)
 
-            if self.single_page: # will get rid off
-                try:
-                    self.set_all_beer_info(beer)
+            try:
+                self.set_all_beer_info(beer)
 
-                    beer_dict = helpers.format_beer_dict(_id              = _id,
-                                                         _type            = "beer",
-                                                         beer_name        = self.beer_name,
-                                                         beer_description = self.beer_description,
-                                                         beer_brewery     = self.beer_brewery,
-                                                         beer_abv         = self.beer_abv,
-                                                         beer_ibu         = self.beer_ibu,
-                                                         beer_hops        = self.beer_hops,
-                                                         beer_malts       = self.beer_malts,
-                                                         beer_avail       = self.beer_avail,
-                                                         beer_style       = self.beer_style,)
-                    self.return_beers.append(beer_dict)
-                except:
-                    pass
-            else: # multipage, list of urls here
-                beer_page = helpers.beautiful_url(url=beer, 
-                                                  cookies=self.cookies, 
-                                                  javascript=self.javascript)
+                beer_dict = helpers.format_beer_dict(_id              = _id,
+                                                     _type            = "beer",
+                                                     beer_name        = self.beer_name,
+                                                     beer_description = self.beer_description,
+                                                     beer_brewery     = self.beer_brewery,
+                                                     beer_abv         = self.beer_abv,
+                                                     beer_ibu         = self.beer_ibu,
+                                                     beer_hops        = self.beer_hops,
+                                                     beer_malts       = self.beer_malts,
+                                                     beer_avail       = self.beer_avail,
+                                                     beer_style       = self.beer_style,)
+                self.return_beers.append(beer_dict)
+            except:
+                pass
             _id += 1
 
-            
-        helpers.set_id(file_name = "beer_id", starting_id = _id)
+        return(_id)
 
 
     def get_beers_list(self, location_url: str):
@@ -123,10 +150,14 @@ class Brewery():
             data = helpers.beautiful_url(url=location_url, 
                                          cookies=self.cookies, 
                                          javascript=self.javascript)            
-            tag, attribute = self.beers_html_tags
-            self.beers = data.find_all(tag, attribute)
+            try:
+                tag, attribute = self.beers_html_tags
+                self.beers = data.find_all(tag, attribute)
+            except:
+                self.beers = data.find_all
         else: # get a list of all the beer urls
-            pass
+            tag, attribute = self.beer_multi_page_tags
+            self.beers = [url['href'] for url in location_url.find_all(tag, attribute, href=True)]
 
     def get_beer_info(self, beer, tags):
         tag, attribute = tags
@@ -158,5 +189,7 @@ class Brewery():
         self.beer_malts = try_to_set(self.beer_malts, self.beer_malts_tags)
         self.beer_avail = try_to_set(self.beer_avail, self.beer_avail_tags)
         self.beer_style = try_to_set(self.beer_style, self.beer_style_tags)
+
+
 
 
