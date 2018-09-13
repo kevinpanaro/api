@@ -9,6 +9,7 @@ from .mayorofoldtown import mayorofoldtown
 from .monks import monks
 from .odell import odell
 from .tiredhands import tired_hands
+from .tiredhands_class import TiredHands
 
 __all__ = [
            "dock_street",
@@ -18,4 +19,5 @@ __all__ = [
            "monks",
            "odell",
            "tired_hands",
+           "TiredHands",
            ]

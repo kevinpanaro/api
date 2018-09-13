@@ -91,7 +91,8 @@ def b_id():
                 "Evil Genius Brewery": 4,
                 "The Mayor of Old Town": 5,
                 "Monk's Cafe": 6,
-                "Odell Brewing": 7}
+                "Odell Brewing": 7,
+                "Black Bottle Brewery": 8}
 
     return(brewery_id)
 

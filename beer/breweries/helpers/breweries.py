@@ -1,10 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import helpers
 
+import logging
 
-
-
+import json
 
 class Brewery():
+
+    logging = logging.getLogger(__name__)
 
     def __init__(self, brewery_name: str,
                  base_url: str,
@@ -15,6 +19,7 @@ class Brewery():
                  single_page: bool,
                  beer_name_tags,
                  beer_description_tags,
+                 beer_parent_tags=None,
                  beers_html_tags=None,
                  beer_brewery_tags=None,
                  beer_abv_tags=None,
@@ -34,6 +39,7 @@ class Brewery():
         self.locations = locations                  # list of brewery locations
         self.single_page = single_page              # bool whether all beers are on the same page
         self.beers_html_tags = beers_html_tags      # parent html tag that encompasses all beers on a html site
+        self.beer_parent_tags = beer_parent_tags
         self.beer_name_tags = beer_name_tags        # html tags for the name of the beer
         self.beer_description_tags = beer_description_tags # html tags for the description of the beer
         self.beer_brewery_tags = beer_brewery_tags  # html tags if location has more than just their beer on tap
@@ -59,17 +65,20 @@ class Brewery():
         self.current_id_name = None
 
     def run(self):
+        logging.info(f"Running {self.brewery_name} Tap Scrape")
         self.main(_id=None)
 
     def decorator_args(id_name):
         def id_decorator(function):
             # gets the id filename and performs a nice decoration
             def wrapper(self, **kwargs):
+                logging.debug(f"Getting id file {id_name}")
                 _id = helpers.get_id(id_name)
                 kwargs["_id"] = _id
                 _id = function(self, **kwargs)
                 helpers.set_id(file_name=id_name, starting_id=_id)
             return(wrapper)
+
         return(id_decorator)
 
 
@@ -79,8 +88,10 @@ class Brewery():
         output = []
 
         for location, url in self.locations.items():
+            logging.info(f"Fetching {location} tap.")
+
             self.return_beers = []
-            
+
             location_url = self.base_url.format(url)
             self.get_beers(location_url=location_url, _id=None)
             output.append({"location": location, 
@@ -102,9 +113,12 @@ class Brewery():
         _id = kwargs.pop("_id")
         location_url = kwargs.pop("location_url")
 
+        logging.info(f"Getting beers for {location_url}")
+
         self.get_beers_list(location_url)
 
         for beer in self.beers:
+
             """
             At this point it is required that beer
             either be, or become a bs4 object.
@@ -117,6 +131,7 @@ class Brewery():
                 beer = helpers.beautiful_url(url=beer, 
                                      cookies=self.cookies, 
                                      javascript=self.javascript)
+
 
             try:
                 self.set_all_beer_info(beer)
@@ -136,7 +151,6 @@ class Brewery():
             except:
                 pass
             _id += 1
-
         return(_id)
 
 
@@ -146,18 +160,24 @@ class Brewery():
 
         """
 
-        if self.single_page:
-            data = helpers.beautiful_url(url=location_url, 
-                                         cookies=self.cookies, 
-                                         javascript=self.javascript)            
+        data = helpers.beautiful_url(url=location_url, 
+                                     cookies=self.cookies, 
+                                     javascript=self.javascript)    
+
+        if self.single_page:    
+            if self.beer_parent_tags:
+                tag, attribute = self.beer_parent_tags
+                data = data.find(tag, attribute)
+
             try:
                 tag, attribute = self.beers_html_tags
                 self.beers = data.find_all(tag, attribute)
             except:
                 self.beers = data.find_all
         else: # get a list of all the beer urls
+            print("multiPage")
             tag, attribute = self.beer_multi_page_tags
-            self.beers = [url['href'] for url in location_url.find_all(tag, attribute, href=True)]
+            self.beers = [url['href'] for url in data.find_all(tag, attribute, href=True)]
 
     def get_beer_info(self, beer, tags):
         tag, attribute = tags
@@ -174,10 +194,12 @@ class Brewery():
             """
             value is an beer part, eg. name, brewery, abv...
             """
+
             try:
                 beer_value = self.get_beer_info(beer, beer_value_tags)
             except:
                 pass
+            logging.info(beer_value)
             return(beer_value)
 
         self.beer_name = try_to_set(self.beer_name, self.beer_name_tags)
@@ -189,6 +211,8 @@ class Brewery():
         self.beer_malts = try_to_set(self.beer_malts, self.beer_malts_tags)
         self.beer_avail = try_to_set(self.beer_avail, self.beer_avail_tags)
         self.beer_style = try_to_set(self.beer_style, self.beer_style_tags)
+
+        logging.info("\n\n")
 
 
 
