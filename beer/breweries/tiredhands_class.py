@@ -1,4 +1,8 @@
-from helpers.breweries import Brewery
+try:
+    from helpers.breweries import Brewery
+except ModuleNotFoundError:
+    from .helpers.breweries import Brewery
+import logging
 
 base_url = "http://www.tiredhands.com/{}/beers/"
 brewery_name = "Tired Hands Brewery"
@@ -13,7 +17,7 @@ beer_description_tags = ('div', 'menu-item-description')
 kill = ["***Other Beverages***", "***Sunday Brunch Beverages***"]
 
 
-TiredHands = Brewery(brewery_name=brewery_name,
+TH = Brewery(brewery_name=brewery_name,
                      base_url=base_url,
                      cookies=cookies,
                      javascript=javascript,
@@ -25,4 +29,14 @@ TiredHands = Brewery(brewery_name=brewery_name,
                      beer_description_tags=beer_description_tags,
                      kill=kill)
 
-TiredHands.run()
+
+
+def TiredHands():
+    TH.run()
+
+if __name__ == '__main__':
+    import logging
+    logLevel=logging.DEBUG
+    FORMAT = '[%(asctime)s] [%(levelname)-8s] %(filename)-15s %(funcName)-18s - %(lineno)-3d - %(message)s'
+    logging.basicConfig(format=FORMAT,level=logLevel)
+    TiredHands()
